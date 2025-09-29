@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#16181B"
+    android:padding="24dp"
+    tools:context=".login1">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Create new account"
+        android:textColor="@android:color/white"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginTop="50dp"
+        android:layout_marginBottom="50dp"/>
+
+    <Button
+        android:id="@+id/btn_google_signup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Sign up with Google"
+        android:textColor="@android:color/white"
+        android:backgroundTint="#4285F4"
+        android:padding="16dp"
+        android:gravity="center"
+        android:layout_marginBottom="16dp"/>
+
+    <Button
+        android:id="@+id/btn_apple_signup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Sign up with Apple"
+        android:textColor="@android:color/white"
+        android:backgroundTint="#000000"
+        android:padding="16dp"
+        android:gravity="center"
+        android:layout_marginBottom="24dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="or"
+        android:textColor="#AAAAAA"
+        android:gravity="center"
+        android:layout_marginBottom="24dp"/>
+
+    <EditText
+        android:id="@+id/et_email_address"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:hint="Enter your email address"
+        android:textColorHint="#999999"
+        android:padding="16dp"
+        android:background="@drawable/rounded_edittext_bg"
+        android:textColor="@android:color/white"
+        android:inputType="textEmailAddress"
+        android:layout_marginBottom="24dp"/>
+
+    <Button
+        android:id="@+id/btn_create_account"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Create account"
+        android:textColor="@android:color/white"
+        android:backgroundTint="#3A3C3E"
+        android:padding="16dp"/>
+
+</LinearLayout>
