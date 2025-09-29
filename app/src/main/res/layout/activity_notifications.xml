@@ -156,6 +156,7 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <Button style="@style/Widget.AppCompat.Button.Borderless"
+            android:id="@+id/btn_nav_home"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -166,6 +167,7 @@
             android:drawableTint="#FFFFFF"/>
 
         <Button style="@style/Widget.AppCompat.Button.Borderless"
+            android:id="@+id/btn_nav_my_work"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -176,6 +178,7 @@
             android:drawableTint="#FFFFFF"/>
 
         <Button style="@style/Widget.AppCompat.Button.Borderless"
+            android:id="@+id/btn_nav_notifications"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -186,6 +189,7 @@
             android:drawableTint="#595DFF"/>
 
         <Button style="@style/Widget.AppCompat.Button.Borderless"
+            android:id="@+id/btn_nav_more"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"

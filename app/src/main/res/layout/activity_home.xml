@@ -116,6 +116,18 @@
 
     </ScrollView>
 
+    <!-- FLOATING ACTION BUTTON (FAB) - Added here -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_add_task"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="24dp"
+        android:src="@android:drawable/ic_input_add"
+        android:tint="@android:color/white"
+        android:backgroundTint="#595DFF"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/bottom_navigation" />
+
     <LinearLayout
         android:id="@+id/bottom_navigation"
         android:layout_width="0dp"
@@ -129,47 +141,32 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <Button style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
+        <!-- Buttons updated to use BottomNavTextStyle for larger text -->
+        <Button style="@style/BottomNavTextStyle"
             android:id="@+id/btn_nav_home"
             android:text="Home"
             android:textColor="#595DFF"
-            android:textSize="12sp"
             android:drawableTop="@android:drawable/ic_menu_gallery"
             android:drawableTint="#595DFF"/>
 
-        <Button style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
+        <Button style="@style/BottomNavTextStyle"
             android:id="@+id/btn_nav_my_work"
             android:text="My work"
             android:textColor="#FFFFFF"
-            android:textSize="12sp"
             android:drawableTop="@android:drawable/ic_menu_agenda"
             android:drawableTint="#FFFFFF"/>
 
-        <Button style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
+        <Button style="@style/BottomNavTextStyle"
             android:id="@+id/btn_nav_notifications"
             android:text="Notifications"
             android:textColor="#FFFFFF"
-            android:textSize="12sp"
             android:drawableTop="@android:drawable/ic_popup_reminder"
             android:drawableTint="#FFFFFF"/>
 
-        <Button style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
+        <Button style="@style/BottomNavTextStyle"
             android:id="@+id/btn_nav_more"
             android:text="More"
             android:textColor="#FFFFFF"
-            android:textSize="12sp"
             android:drawableTop="@android:drawable/ic_menu_more"
             android:drawableTint="#FFFFFF"/>
 

@@ -5,12 +5,11 @@ import android.os.Bundle
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 
-class MoreActivity : AppCompatActivity() {
+class NotificationsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_more)
+        setContentView(R.layout.activity_notifications) // Links to your notifications XML
 
-        // Get references to all 4 buttons in the bottom navigation
         val btnHome: Button = findViewById(R.id.btn_nav_home)
         val btnMyWork: Button = findViewById(R.id.btn_nav_my_work)
         val btnNotifications: Button = findViewById(R.id.btn_nav_notifications)
@@ -25,12 +24,12 @@ class MoreActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        // Set listeners for all screens EXCEPT the current one (More)
         btnHome.setOnClickListener { navigateTo(HomeActivity::class.java) }
         btnMyWork.setOnClickListener { navigateTo(MyWorkActivity::class.java) }
-        btnNotifications.setOnClickListener { navigateTo(NotificationsActivity::class.java) }
 
-        // More Button (ACTIVE: Does nothing, stays here)
-        btnMore.setOnClickListener { /* Already on More, do nothing */ }
+        // Notifications Button (ACTIVE: Does nothing, stays here)
+        btnNotifications.setOnClickListener { /* Already on Notifications, do nothing */ }
+
+        btnMore.setOnClickListener { navigateTo(MoreActivity::class.java) }
     }
 }
