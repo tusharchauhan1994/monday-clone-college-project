@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "546644971323",
+    "firebase_url": "https://monday-56d9d-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "monday-56d9d",
+    "storage_bucket": "monday-56d9d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:546644971323:android:5eb7a4d01d770e1bab311e",
+        "android_client_info": {
+          "package_name": "com.example.myapplication"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB30lzHjkT6qbFhCV407EXnafQl8ahoJOU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
