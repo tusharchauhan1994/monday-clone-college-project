@@ -13,16 +13,15 @@
         android:theme="@style/Theme.MondayCloneApp">
 
         <activity
-            android:name=".LoginStartActivity"
+            android:name=".StartActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <activity android:name=".HomeActivity"/>
+        <activity android:name=".LoginStartActivity"/> <activity android:name=".HomeActivity"/>
         <activity android:name=".MyWorkActivity"/>
         <activity android:name=".AddTaskActivity"/>
         <activity android:name=".MoreActivity"/>

@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView // Import for the back button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 
@@ -12,22 +13,22 @@ class LoginStartActivity : AppCompatActivity() {
     // Declare the UI components we need to interact with
     private lateinit var editTextEmail: EditText
     private lateinit var editTextPassword: EditText
-    private lateinit var buttonCreateAccount: Button
+    private lateinit var buttonContinue: Button // Renamed for clarity in this screen
+    private lateinit var btnBack: ImageView // Added for back button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login_start)
 
         // Initialize UI elements using their IDs from the XML
-        // Note: et_email_address is used for the email input
         editTextEmail = findViewById(R.id.et_email_address)
-        // Note: editTextPassword is used for the password input
         editTextPassword = findViewById(R.id.editTextPassword)
-        // Note: btn_create_account is used as the trigger button
-        buttonCreateAccount = findViewById(R.id.btn_create_account)
+        // btn_create_account is now used as 'Continue with email'
+        buttonContinue = findViewById(R.id.btn_create_account)
+        btnBack = findViewById(R.id.btn_back) // Initialize the back button
 
-        // Set the click listener for the "Create account" button
-        buttonCreateAccount.setOnClickListener {
+        // Set the click listener for the 'Continue with email' button
+        buttonContinue.setOnClickListener {
             val email = editTextEmail.text.toString()
             val password = editTextPassword.text.toString()
 
@@ -38,6 +39,11 @@ class LoginStartActivity : AppCompatActivity() {
                 // Use the static authentication logic
                 authenticateUser(email, password)
             }
+        }
+
+        // Set the click listener for the back button
+        btnBack.setOnClickListener {
+            finish() // Go back to the previous activity (StartActivity)
         }
     }
 

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#16181B"
+    android:paddingHorizontal="24dp"
+    tools:context=".StartActivity">
+
+    <LinearLayout
+        android:id="@+id/header_row"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingTop="40dp"
+        android:paddingBottom="40dp"
+        android:gravity="center_vertical"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="start">
+
+            <ImageView
+                android:layout_width="140dp"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                android:src="@drawable/start_login_logo"
+                android:contentDescription="Monday.com Logo"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Get your work done anytime, anywhere"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"/>
+        </LinearLayout>
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@android:drawable/ic_menu_myplaces"
+            android:tint="@android:color/white"
+            android:layout_marginEnd="16dp"
+            android:contentDescription="World"/>
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@android:drawable/ic_dialog_alert"
+            android:tint="@android:color/white"
+            android:contentDescription="Info"/>
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/illustration_image"
+        android:layout_width="0dp"  android:layout_height="0dp" android:scaleType="fitCenter" android:src="@drawable/start_center_logo"
+        android:contentDescription="Monday Illustration"
+        app:layout_constraintDimensionRatio="1:1.5"  app:layout_constraintTop_toBottomOf="@id/header_row"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/btn_login"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="60dp"
+        app:layout_constraintWidth_percent="0.6" app:layout_constraintVertical_bias="0.5" />
+
+    <Button
+        android:id="@+id/btn_login"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Log in"
+        android:textColor="@android:color/white"
+        android:backgroundTint="#595DFF"
+        android:padding="16dp"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintBottom_toTopOf="@id/btn_create_new_account"/>
+
+    <Button
+        android:id="@+id/btn_create_new_account"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Create new account"
+        android:textColor="#595DFF"
+        android:background="@android:color/transparent"
+        android:padding="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

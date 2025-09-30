@@ -2,7 +2,6 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/main"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -11,38 +10,52 @@
     android:padding="24dp"
     tools:context=".LoginStartActivity">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="32dp">
+
+        <ImageView
+            android:id="@+id/btn_back"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@android:drawable/ic_menu_gallery"
+            android:tint="@android:color/white"
+            android:layout_weight="1"
+            android:layout_marginStart="-12dp"
+            android:visibility="invisible"
+            tools:visibility="visible"
+            android:contentDescription="Back"/>
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@android:drawable/ic_dialog_alert"
+            android:tint="@android:color/white"
+            android:contentDescription="Info"/>
+    </LinearLayout>
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Create new account"
+        android:text="Log in to your account"
         android:textColor="@android:color/white"
         android:textSize="24sp"
         android:textStyle="bold"
-        android:gravity="center"
-        android:layout_marginTop="50dp"
         android:layout_marginBottom="50dp"/>
 
     <Button
         android:id="@+id/btn_google_signup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Sign up with Google"
+        android:text="Log in with Google"
         android:textColor="@android:color/white"
-        android:backgroundTint="#4285F4"
+        android:backgroundTint="#595DFF"
         android:padding="16dp"
         android:gravity="center"
         android:layout_marginBottom="16dp"/>
-
-    <Button
-        android:id="@+id/btn_apple_signup"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Sign up with Apple"
-        android:textColor="@android:color/white"
-        android:backgroundTint="#000000"
-        android:padding="16dp"
-        android:gravity="center"
-        android:layout_marginBottom="24dp"/>
 
     <TextView
         android:layout_width="match_parent"
@@ -52,7 +65,6 @@
         android:gravity="center"
         android:layout_marginBottom="24dp"/>
 
-    <!-- Retained Email/Username field (original ID: et_email_address) -->
     <EditText
         android:id="@+id/et_email_address"
         android:layout_width="match_parent"
@@ -65,12 +77,11 @@
         android:inputType="textEmailAddress"
         android:layout_marginBottom="16dp"/>
 
-    <!-- NEW: Password Field added here -->
     <EditText
         android:id="@+id/editTextPassword"
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:hint="Create a strong password"
+        android:hint="Password"
         android:textColorHint="#999999"
         android:padding="16dp"
         android:background="@drawable/rounded_edittext_bg"
@@ -82,9 +93,17 @@
         android:id="@+id/btn_create_account"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Create account"
+        android:text="Continue with email"
         android:textColor="@android:color/white"
         android:backgroundTint="#3A3C3E"
         android:padding="16dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Logged in on desktop? Scan QR code"
+        android:textColor="#595DFF"
+        android:gravity="center"
+        android:layout_marginTop="24dp"/>
 
 </LinearLayout>
