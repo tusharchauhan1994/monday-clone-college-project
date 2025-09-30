@@ -68,7 +68,7 @@
                 android:layout_marginBottom="40dp"/>
 
             <!-- Google Login Button -->
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_google_signup"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
@@ -76,9 +76,15 @@
                 android:textColor="@android:color/white"
                 android:textSize="16sp"
                 android:textAllCaps="false"
-                android:backgroundTint="#595DFF"
+                app:backgroundTint="#595DFF"
                 app:cornerRadius="8dp"
-                android:gravity="center"
+                app:icon="@drawable/ic_google"
+                app:iconGravity="textStart"
+                app:iconPadding="12dp"
+                app:iconSize="24dp"
+                app:iconTint="@null"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
                 android:layout_marginBottom="24dp"/>
 
             <!-- OR Divider -->
