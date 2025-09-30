@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item>
-        <bitmap
-            android:src="@drawable/app_logo"
-            android:gravity="center"
-            android:tintMode="multiply"/>
-    </item>
+    <item
+        android:drawable="@drawable/app_logo"
+        android:width="72dp"
+        android:height="72dp"
+        android:gravity="center" />
 </layer-list>
