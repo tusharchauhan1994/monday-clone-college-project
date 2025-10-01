@@ -8,9 +8,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:546644971323:android:5eb7a4d01d770e1bab311e",
+        "mobilesdk_app_id": "1:546644971323:android:227dcc9c62460a43ab311e",
         "android_client_info": {
-          "package_name": "com.example.myapplication"
+          "package_name": "com.example.mondaycloneapp"
         }
       },
       "oauth_client": [],
