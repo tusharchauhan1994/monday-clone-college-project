@@ -13,7 +13,20 @@
           "package_name": "com.example.mondaycloneapp"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "546644971323-10ca528ej7fs9gqv6tn1n2a42qaluudl.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.mondaycloneapp",
+            "certificate_hash": "0f01b0868ef7eda9094032c9cb7b39f21aa19338"
+          }
+        },
+        {
+          "client_id": "546644971323-0e2e7p5cggm4v0hlns57a48mh4mf64ac.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyB30lzHjkT6qbFhCV407EXnafQl8ahoJOU"
@@ -21,7 +34,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "546644971323-0e2e7p5cggm4v0hlns57a48mh4mf64ac.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
