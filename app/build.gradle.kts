@@ -38,10 +38,18 @@ android {
 }
 
 dependencies {
+    // Google Sign-In
     implementation("com.google.android.gms:play-services-auth:21.2.0")
-    implementation("com.google.firebase:firebase-analytics")
+
+    // Declare the Firebase BoM first
     implementation(platform("com.google.firebase:firebase-bom:34.3.0"))
+
+    // Now, add other Firebase libraries without versions
+    implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-firestore-ktx:25.0.0")
+
+    // AndroidX & Testing Libraries (from Version Catalog)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
