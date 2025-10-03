@@ -7,12 +7,42 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mondaycloneapp.models.Item
 
-class ItemAdapter(private var items: List<Item>) : RecyclerView.Adapter<ItemAdapter.ItemViewHolder>() {
+class ItemAdapter(
+    private var items: List<Item>,
+    private val listener: OnItemClickListener // Add a listener property
+) : RecyclerView.Adapter<ItemAdapter.ItemViewHolder>() {
+
+    // Interface to handle click events in the hosting activity
+    interface OnItemClickListener {
+        fun onItemClick(item: Item)
+        fun onItemLongClick(item: Item)
+    }
 
     // This class holds the UI elements for a single row.
-    class ItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    inner class ItemViewHolder(view: View) : RecyclerView.ViewHolder(view), View.OnClickListener, View.OnLongClickListener {
         val itemName: TextView = view.findViewById(R.id.tv_item_name)
         val itemStatus: TextView = view.findViewById(R.id.tv_item_status)
+
+        init {
+            itemView.setOnClickListener(this)
+            itemView.setOnLongClickListener(this)
+        }
+
+        override fun onClick(v: View?) {
+            val position = adapterPosition
+            if (position != RecyclerView.NO_POSITION) {
+                listener.onItemClick(items[position])
+            }
+        }
+
+        override fun onLongClick(v: View?): Boolean {
+            val position = adapterPosition
+            if (position != RecyclerView.NO_POSITION) {
+                listener.onItemLongClick(items[position])
+                return true
+            }
+            return false
+        }
     }
 
     // This is called when the RecyclerView needs a new row layout.
