@@ -11,12 +11,12 @@ import androidx.fragment.app.DialogFragment
 import com.example.mondaycloneapp.models.Board
 import com.example.mondaycloneapp.models.Group
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.database.FirebaseDatabase
 
 // This dialog shows the options when the FAB is tapped in HomeActivity
 class DialogFabOptions : DialogFragment() {
 
-    private val db = FirebaseFirestore.getInstance()
+    private val db = FirebaseDatabase.getInstance().reference
     private val auth = FirebaseAuth.getInstance()
     private val userId: String? get() = auth.currentUser?.uid
 
@@ -56,7 +56,7 @@ class DialogFabOptions : DialogFragment() {
     }
 
     /**
-     * Creates a new default board and a default group inside it in Firebase Firestore.
+     * Creates a new default board and a default group inside it in Firebase Realtime Database.
      */
     private fun createNewBoard() {
         val uid = userId
@@ -71,17 +71,16 @@ class DialogFabOptions : DialogFragment() {
         val defaultGroup = Group(boardId = newBoard.id, name = defaultGroupName, orderIndex = 0)
 
         // Path: users/{uid}/boards/{newBoard.id}
-        db.collection("users").document(uid).collection("boards")
-            .document(newBoard.id)
-            .set(newBoard)
+        db.child("users").child(uid).child("boards").child(newBoard.id)
+            .setValue(newBoard)
             .addOnSuccessListener {
                 // If the board is created successfully, now create the default group inside it
-                db.collection("users").document(uid).collection("boards")
-                    .document(newBoard.id).collection("groups")
-                    .document(defaultGroup.id)
-                    .set(defaultGroup)
+                db.child("users").child(uid).child("boards")
+                    .child(newBoard.id).child("groups")
+                    .child(defaultGroup.id)
+                    .setValue(defaultGroup)
                     .addOnSuccessListener {
-                        Log.d("BoardCreation", "SUCCESS: Group was created in Firestore.")
+                        Log.d("BoardCreation", "SUCCESS: Group was created in Realtime Database.")
                         Toast.makeText(context, "Board '$boardName' created!", Toast.LENGTH_LONG).show()
                         // Tell the Home screen to refresh its list
                         (activity as? HomeActivity)?.refreshData()

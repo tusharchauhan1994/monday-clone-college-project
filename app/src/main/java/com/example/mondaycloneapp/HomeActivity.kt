@@ -8,13 +8,13 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.database.*
 import com.example.mondaycloneapp.models.Board // Import the new Board blueprint
 
 class HomeActivity : AppCompatActivity() {
 
     // 1. Initialize Firebase tools outside of onCreate so they can be used anywhere
-    private val db = FirebaseFirestore.getInstance()
+    private val db = FirebaseDatabase.getInstance().reference
     private val auth = FirebaseAuth.getInstance()
     private lateinit var fabAddTask: FloatingActionButton
 
@@ -53,36 +53,28 @@ class HomeActivity : AppCompatActivity() {
     }
 
     /**
-     * Connects to Firebase Firestore to retrieve the user's recent Boards in real-time.
+     * Connects to Firebase Realtime Database to retrieve the user's recent Boards in real-time.
      */
     private fun loadRecentlyVisitedBoards() {
         // If no user is logged in (e.g., they haven't finished sign-in), stop here.
         val userId = auth.currentUser?.uid ?: return
 
         // 3. Set up a real-time listener to get the top 5 most recently updated Boards
-        db.collection("users").document(userId)
-            .collection("boards")
-            // Sort to make the most recently updated board show up first
-            .orderBy("lastVisitedAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
-            .limit(5) // Just showing the top few, like the real app
-            .addSnapshotListener { snapshot, e ->
-                // Check if there was an error loading the data
-                if (e != null) {
-                    Log.w("HomeActivity", "Failed to load recent boards.", e)
-                    return@addSnapshotListener
-                }
-
-                if (snapshot != null) {
-                    // Convert the data from the database into our Kotlin Board blueprint (Data Class)
-                    val boards = snapshot.documents.mapNotNull { doc ->
-                        doc.toObject(Board::class.java)
-                    }
+        db.child("users").child(userId).child("boards")
+            .orderByChild("lastVisitedAt").limitToLast(5)
+            .addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val boards = snapshot.children.mapNotNull { it.getValue(Board::class.java) }.reversed()
                     Log.d("HomeActivity", "Loaded ${boards.size} recent boards.")
 
                     // TODO: The next major step will be to display these 'boards' using a RecyclerView
                     // in the section called "Recently visited" in activity_home.xml.
                 }
-            }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.w("HomeActivity", "Failed to load recent boards.", error.toException())
+                }
+            })
     }
 
 

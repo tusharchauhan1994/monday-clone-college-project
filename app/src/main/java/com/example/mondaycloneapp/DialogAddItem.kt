@@ -16,12 +16,15 @@ import com.example.mondaycloneapp.models.Group
 import com.example.mondaycloneapp.models.Item
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 
 // Dialog for adding a new Item (Task) within a selected Board and Group.
 class DialogAddItem : DialogFragment() {
 
-    private val db = FirebaseFirestore.getInstance()
+    private val db = FirebaseDatabase.getInstance().reference
     private val auth = FirebaseAuth.getInstance()
     private val userId: String? get() = auth.currentUser?.uid
 
@@ -71,51 +74,53 @@ class DialogAddItem : DialogFragment() {
     private fun loadBoards() {
         val uid = userId ?: return
 
-        db.collection("users").document(uid).collection("boards")
-            .limit(10)
-            .get()
-            .addOnSuccessListener { snapshot ->
-                boardsList = snapshot.documents.mapNotNull { it.toObject(Board::class.java) }
+        db.child("users").child(uid).child("boards").limitToFirst(10)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    boardsList = snapshot.children.mapNotNull { it.getValue(Board::class.java) }
 
-                if (boardsList.isNotEmpty()) {
-                    selectedBoard = boardsList.first()
-                    updateBoardUI()
-                    loadGroups(selectedBoard!!.id)
-                } else {
-                    tvSelectedBoard.text = "No Boards available"
-                    tvSelectedGroup.text = "No Groups available"
+                    if (boardsList.isNotEmpty()) {
+                        selectedBoard = boardsList.first()
+                        updateBoardUI()
+                        loadGroups(selectedBoard!!.id)
+                    } else {
+                        tvSelectedBoard.text = "No Boards available"
+                        tvSelectedGroup.text = "No Groups available"
+                    }
                 }
-            }
-            .addOnFailureListener { e ->
-                Toast.makeText(context, "Failed to load boards.", Toast.LENGTH_SHORT).show()
-                Log.e("AddItemDialog", "Error loading boards: ${e.message}")
-            }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Toast.makeText(context, "Failed to load boards.", Toast.LENGTH_SHORT).show()
+                    Log.e("AddItemDialog", "Error loading boards: ${error.message}")
+                }
+            })
     }
 
     private fun loadGroups(boardId: String) {
         val uid = userId ?: return
 
-        db.collection("users").document(uid).collection("boards").document(boardId)
-            .collection("groups")
-            .get()
-            .addOnSuccessListener { snapshot ->
-                Log.d("GroupLoading", "SUCCESS: Query finished. Found ${snapshot.size()} groups.")
-                groupsList = snapshot.documents.mapNotNull { it.toObject(Group::class.java) }
+        db.child("users").child(uid).child("boards").child(boardId)
+            .child("groups").addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    Log.d("GroupLoading", "SUCCESS: Query finished. Found ${snapshot.childrenCount} groups.")
+                    groupsList = snapshot.children.mapNotNull { it.getValue(Group::class.java) }
 
-                if (groupsList.isNotEmpty()) {
-                    selectedGroup = groupsList.first()
-                    updateGroupUI()
-                    // FIX: Enable the save button now that we have a default group selected.
-                    btnSave.isEnabled = true
-                } else {
-                    selectedGroup = null
-                    tvSelectedGroup.text = "No Groups available"
+                    if (groupsList.isNotEmpty()) {
+                        selectedGroup = groupsList.first()
+                        updateGroupUI()
+                        // FIX: Enable the save button now that we have a default group selected.
+                        btnSave.isEnabled = true
+                    } else {
+                        selectedGroup = null
+                        tvSelectedGroup.text = "No Groups available"
+                    }
                 }
-            }
-            .addOnFailureListener { e ->
-                Toast.makeText(context, "Failed to load groups.", Toast.LENGTH_SHORT).show()
-                Log.e("AddItemDialog", "Error loading groups: ${e.message}")
-            }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Toast.makeText(context, "Failed to load groups.", Toast.LENGTH_SHORT).show()
+                    Log.e("AddItemDialog", "Error loading groups: ${error.message}")
+                }
+            })
     }
 
     private fun updateBoardUI() {
@@ -197,10 +202,10 @@ class DialogAddItem : DialogFragment() {
             userId = uid
         )
 
-        db.collection("users").document(uid).collection("boards").document(boardId)
-            .collection("groups").document(groupId).collection("items")
-            .document(newItem.id)
-            .set(newItem)
+        db.child("users").child(uid).child("boards").child(boardId)
+            .child("groups").child(groupId).child("items")
+            .child(newItem.id)
+            .setValue(newItem)
             .addOnSuccessListener {
                 Toast.makeText(context, "Item '$itemName' added successfully!", Toast.LENGTH_SHORT).show()
                 dismiss()

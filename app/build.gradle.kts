@@ -47,7 +47,8 @@ dependencies {
     // Now, add other Firebase libraries without versions
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-auth")
-    implementation("com.google.firebase:firebase-firestore-ktx:25.0.0")
+    implementation("com.google.firebase:firebase-database")
+    implementation("com.google.firebase:firebase-storage")
 
     // AndroidX & Testing Libraries (from Version Catalog)
     implementation(libs.androidx.core.ktx)

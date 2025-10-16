@@ -13,13 +13,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.mondaycloneapp.models.Item
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.database.*
 
 class MyWorkActivity : AppCompatActivity(), ItemAdapter.OnItemClickListener { // Implement the listener
 
     private lateinit var rvItems: RecyclerView
     private lateinit var itemAdapter: ItemAdapter
-    private val db = FirebaseFirestore.getInstance()
+    private val db = FirebaseDatabase.getInstance().reference
     private val auth = FirebaseAuth.getInstance()
     private var itemsList = mutableListOf<Item>()
 
@@ -41,7 +41,7 @@ class MyWorkActivity : AppCompatActivity(), ItemAdapter.OnItemClickListener { //
         itemAdapter = ItemAdapter(itemsList, this)
         rvItems.adapter = itemAdapter
 
-        // 3. Load the items from Firestore
+        // 3. Load the items from Realtime Database
         loadItems()
 
         // 4. Set up Bottom Navigation
@@ -51,22 +51,31 @@ class MyWorkActivity : AppCompatActivity(), ItemAdapter.OnItemClickListener { //
     private fun loadItems() {
         val userId = auth.currentUser?.uid ?: return
 
-        db.collectionGroup("items")
-            .whereEqualTo("userId", userId)
-            .addSnapshotListener { snapshot, e ->
-                if (e != null) {
-                    Log.e("MyWorkActivity", "Error loading items", e)
-                    return@addSnapshotListener
+        val userRef = db.child("users").child(userId)
+        userRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                itemsList.clear()
+                val boardsSnapshot = snapshot.child("boards")
+                for (boardSnapshot in boardsSnapshot.children) {
+                    val groupsSnapshot = boardSnapshot.child("groups")
+                    for (groupSnapshot in groupsSnapshot.children) {
+                        val itemsSnapshot = groupSnapshot.child("items")
+                        for (itemSnapshot in itemsSnapshot.children) {
+                            val item = itemSnapshot.getValue(Item::class.java)
+                            if (item != null) {
+                                itemsList.add(item)
+                            }
+                        }
+                    }
                 }
-
-                if (snapshot != null) {
-                    itemsList.clear()
-                    val items = snapshot.documents.mapNotNull { it.toObject(Item::class.java) }
-                    itemsList.addAll(items)
-                    itemAdapter.notifyDataSetChanged()
-                    Log.d("MyWorkActivity", "Successfully loaded ${itemsList.size} items.")
-                }
+                itemAdapter.notifyDataSetChanged()
+                Log.d("MyWorkActivity", "Successfully loaded ${itemsList.size} items.")
             }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("MyWorkActivity", "Error loading items", error.toException())
+            }
+        })
     }
 
     // Function to show a dialog for updating an item's name
@@ -92,14 +101,11 @@ class MyWorkActivity : AppCompatActivity(), ItemAdapter.OnItemClickListener { //
         builder.show()
     }
 
-    // Function to update the item's name in Firestore
+    // Function to update the item's name in Realtime Database
     private fun updateItemName(item: Item, newName: String) {
-        val itemRef = db.collection("users").document(item.userId)
-            .collection("boards").document(item.boardId)
-            .collection("groups").document(item.groupId)
-            .collection("items").document(item.id)
+        val itemRef = db.child("users").child(item.userId).child("boards").child(item.boardId).child("groups").child(item.groupId).child("items").child(item.id)
 
-        itemRef.update("name", newName)
+        itemRef.child("name").setValue(newName)
             .addOnSuccessListener {
                 Toast.makeText(this, "Item updated successfully", Toast.LENGTH_SHORT).show()
             }
@@ -109,14 +115,11 @@ class MyWorkActivity : AppCompatActivity(), ItemAdapter.OnItemClickListener { //
             }
     }
 
-    // Function to delete an item from Firestore
+    // Function to delete an item from Realtime Database
     private fun deleteItem(item: Item) {
-        val itemRef = db.collection("users").document(item.userId)
-            .collection("boards").document(item.boardId)
-            .collection("groups").document(item.groupId)
-            .collection("items").document(item.id)
+        val itemRef = db.child("users").child(item.userId).child("boards").child(item.boardId).child("groups").child(item.groupId).child("items").child(item.id)
 
-        itemRef.delete()
+        itemRef.removeValue()
             .addOnSuccessListener {
                 Toast.makeText(this, "Item deleted successfully", Toast.LENGTH_SHORT).show()
             }
