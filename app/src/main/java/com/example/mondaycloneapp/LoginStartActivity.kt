@@ -2,34 +2,35 @@ package com.example.mondaycloneapp
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log // NEW: For logging errors
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.gms.auth.api.signin.GoogleSignIn // NEW: Google Sign-In
-import com.google.android.gms.auth.api.signin.GoogleSignInClient // NEW: Google Sign-In Client
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions // NEW: Google Sign-In Options
-import com.google.android.gms.common.api.ApiException // NEW: For handling Google sign-in errors
-import com.google.android.material.button.MaterialButton // NEW: Import for the Google button
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
+import com.google.android.material.button.MaterialButton
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.GoogleAuthProvider // NEW: Firebase Google Provider
+import com.google.firebase.auth.GoogleAuthProvider
 
 class LoginStartActivity : AppCompatActivity() {
 
     private lateinit var editTextEmail: EditText
     private lateinit var editTextPassword: EditText
-    private lateinit var buttonContinue: Button
+    private lateinit var buttonLogin: Button
+    private lateinit var createAccountTextView: TextView
     private lateinit var btnBack: ImageView
-    private lateinit var btnGoogleSignIn: MaterialButton // NEW: Google Button Declaration
+    private lateinit var btnGoogleSignIn: MaterialButton
 
     private lateinit var auth: FirebaseAuth
-    private lateinit var googleSignInClient: GoogleSignInClient // NEW: Google Sign-In Client Declaration
+    private lateinit var googleSignInClient: GoogleSignInClient
 
-    // NEW: Activity Result Launcher for Google Sign-In
     private val googleSignInLauncher: ActivityResultLauncher<Intent> =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
@@ -50,29 +51,24 @@ class LoginStartActivity : AppCompatActivity() {
 
         auth = FirebaseAuth.getInstance()
 
-        // 1. Initialize Google Sign-In Options and Client
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            // Use the Web Client ID (audience) from google-services.json if you had one,
-            // or use the R.string.default_web_client_id provided by Firebase
             .requestIdToken(getString(R.string.default_web_client_id))
             .requestEmail()
             .build()
         googleSignInClient = GoogleSignIn.getClient(this, gso)
 
-        // Initialize UI elements
         editTextEmail = findViewById(R.id.et_email_address)
         editTextPassword = findViewById(R.id.editTextPassword)
-        buttonContinue = findViewById(R.id.btn_create_account)
+        buttonLogin = findViewById(R.id.btn_login)
+        createAccountTextView = findViewById(R.id.tv_create_account)
         btnBack = findViewById(R.id.btn_back)
-        btnGoogleSignIn = findViewById(R.id.btn_google_signup) // Initialize Google Button
+        btnGoogleSignIn = findViewById(R.id.btn_google_signup)
 
-        // 2. Set Click Listener for Google Button
         btnGoogleSignIn.setOnClickListener {
             signInWithGoogle()
         }
 
-        // Set the click listener for Email/Password (Existing Logic)
-        buttonContinue.setOnClickListener {
+        buttonLogin.setOnClickListener {
             val email = editTextEmail.text.toString()
             val password = editTextPassword.text.toString()
             if (email.isEmpty() || password.isEmpty()) {
@@ -82,18 +78,20 @@ class LoginStartActivity : AppCompatActivity() {
             }
         }
 
+        createAccountTextView.setOnClickListener {
+            startActivity(Intent(this, CreateAccountActivity::class.java))
+        }
+
         btnBack.setOnClickListener {
             finish()
         }
     }
 
-    // 3. Helper function to launch the Google Sign-In Intent
     private fun signInWithGoogle() {
         val signInIntent = googleSignInClient.signInIntent
         googleSignInLauncher.launch(signInIntent)
     }
 
-    // 4. Function to exchange Google ID Token for a Firebase Credential
     private fun firebaseAuthWithGoogle(idToken: String) {
         val credential = GoogleAuthProvider.getCredential(idToken, null)
         auth.signInWithCredential(credential)
@@ -109,7 +107,6 @@ class LoginStartActivity : AppCompatActivity() {
             }
     }
 
-    // Existing firebaseLogin remains here (for email/password)
     private fun firebaseLogin(email: String, password: String) {
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->

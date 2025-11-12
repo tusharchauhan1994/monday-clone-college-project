@@ -8,7 +8,7 @@
     android:layout_height="match_parent"
     android:background="#16181B"
     android:padding="24dp"
-    tools:context=".LoginStartActivity">
+    tools:context=".CreateAccountActivity">
 
     <!-- Back Button (Left) -->
     <ImageView
@@ -60,7 +60,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Log in to your account"
+                android:text="Create your account"
                 android:textColor="@android:color/white"
                 android:textSize="28sp"
                 android:textStyle="bold"
@@ -72,7 +72,7 @@
                 android:id="@+id/btn_google_signup"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:text="Log in with Google"
+                android:text="Sign up with Google"
                 android:textColor="@android:color/white"
                 android:textSize="16sp"
                 android:textAllCaps="false"
@@ -144,14 +144,29 @@
                 android:paddingVertical="16dp"
                 android:background="@drawable/rounded_edittext_bg"
                 android:inputType="textPassword"
+                android:layout_marginBottom="16dp"/>
+
+            <!-- Confirm Password Input -->
+            <EditText
+                android:id="@+id/editTextConfirmPassword"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:hint="Confirm Password"
+                android:textColorHint="#999999"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="16dp"
+                android:background="@drawable/rounded_edittext_bg"
+                android:inputType="textPassword"
                 android:layout_marginBottom="24dp"/>
 
             <!-- Continue Button -->
             <Button
-                android:id="@+id/btn_login"
+                android:id="@+id/btn_create_account"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:text="Continue with email"
+                android:text="Create account"
                 android:textColor="@android:color/white"
                 android:textSize="16sp"
                 android:textAllCaps="false"
@@ -159,32 +174,20 @@
                 app:cornerRadius="8dp"
                 android:layout_marginBottom="24dp"/>
 
-            <TextView
-                android:id="@+id/tv_create_account"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Don't have an account? Create one"
-                android:textColor="#595DFF"
-                android:textSize="15sp"
-                android:gravity="center"
-                android:paddingVertical="12dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:background="?attr/selectableItemBackground"/>
-
             <!-- QR Code Link -->
             <TextView
                 android:id="@+id/tv_qr_code"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Logged in on desktop? Scan QR code"
-                android.textColor="#595DFF"
+                android:textColor="#595DFF"
                 android:textSize="15sp"
                 android:gravity="center"
                 android:paddingVertical="12dp"
                 android:clickable="true"
                 android:focusable="true"
-                android:background="?attr/selectableItemBackground"/>
+                android:background="?attr/selectableItemBackground"
+                android:visibility="gone"/>
 
         </LinearLayout>
     </ScrollView>
