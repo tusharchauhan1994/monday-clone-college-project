@@ -18,7 +18,8 @@ data class Board(
     val id: String = "",
     val name: String = "New Board",
     val ownerId: String = "",
-    val members: Map<String, Boolean> = emptyMap()
+    val members: Map<String, Boolean> = emptyMap(),
+    val createdAt: Long = 0L
 )
 
 /**

@@ -3,7 +3,7 @@ package com.example.mondaycloneapp
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -70,10 +70,10 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun setupBottomNavigation() {
-        val btnHome: Button = findViewById(R.id.btn_nav_home)
-        val btnMyWork: Button = findViewById(R.id.btn_nav_my_work)
-        val btnNotifications: Button = findViewById(R.id.btn_nav_notifications)
-        val btnMore: Button = findViewById(R.id.btn_nav_more)
+        val btnHome: LinearLayout = findViewById(R.id.btn_nav_home)
+        val btnMyWork: LinearLayout = findViewById(R.id.btn_nav_my_work)
+        val btnNotifications: LinearLayout = findViewById(R.id.btn_nav_notifications)
+        val btnMore: LinearLayout = findViewById(R.id.btn_nav_more)
 
         fun navigateTo(targetActivity: Class<*>) {
             val intent = Intent(this, targetActivity).apply {

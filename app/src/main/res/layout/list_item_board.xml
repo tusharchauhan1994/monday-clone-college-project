@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="12dp"
+    android:paddingBottom="12dp"
+    android:paddingStart="8dp"
+    android:paddingEnd="8dp"
+    android:background="?attr/selectableItemBackground">
+
+    <!-- Board Icon with colored bars -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/board_icon_container"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="0dp"
+        app:cardBackgroundColor="#3A3D42"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="6dp">
+
+            <!-- Monday logo icon -->
+            <ImageView
+                android:id="@+id/iv_board_icon"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@android:drawable/ic_menu_gallery"
+                android:tint="#595DFF"
+                android:layout_marginBottom="3dp"/>
+
+            <!-- Three gray columns -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:orientation="horizontal"
+                android:layout_marginBottom="2dp">
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="#555555"
+                    android:layout_marginEnd="1.5dp"/>
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="#555555"
+                    android:layout_marginEnd="1.5dp"/>
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="#555555"/>
+            </LinearLayout>
+
+            <!-- Green row -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2.5dp"
+                android:background="#00D647"
+                android:layout_marginBottom="1.5dp"/>
+
+            <!-- Red row -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2.5dp"
+                android:background="#E44258"/>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- Board Name -->
+    <TextView
+        android:id="@+id/tv_board_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="14dp"
+        android:layout_marginEnd="8dp"
+        android:text="Start from scratch"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        android:textStyle="normal"
+        android:maxLines="1"
+        android:ellipsize="end"
+        app:layout_constraintStart_toEndOf="@id/board_icon_container"
+        app:layout_constraintEnd_toStartOf="@id/iv_star"
+        app:layout_constraintTop_toTopOf="@id/board_icon_container"
+        app:layout_constraintVertical_chainStyle="packed"
+        app:layout_constraintBottom_toTopOf="@id/tv_last_changed"/>
+
+    <!-- Last Changed Time -->
+    <TextView
+        android:id="@+id/tv_last_changed"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="14dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="2dp"
+        android:text="Changed 1min ago"
+        android:textColor="#888888"
+        android:textSize="13sp"
+        android:maxLines="1"
+        android:ellipsize="end"
+        app:layout_constraintStart_toEndOf="@id/board_icon_container"
+        app:layout_constraintEnd_toStartOf="@id/iv_star"
+        app:layout_constraintTop_toBottomOf="@id/tv_board_name"
+        app:layout_constraintBottom_toBottomOf="@id/board_icon_container"/>
+
+    <!-- Star Icon -->
+    <ImageView
+        android:id="@+id/iv_star"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@android:drawable/btn_star_big_off"
+        android:tint="#666666"
+        android:padding="2dp"
+        android:layout_marginEnd="8dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        app:layout_constraintEnd_toStartOf="@id/color_indicator"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <!-- Color Indicator on right -->
+    <LinearLayout
+        android:id="@+id/color_indicator"
+        android:layout_width="4dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:layout_marginEnd="4dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/board_icon_container"
+        app:layout_constraintBottom_toBottomOf="@id/board_icon_container">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="#595DFF"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="#FFD700"
+            android:layout_marginTop="1dp"/>
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
