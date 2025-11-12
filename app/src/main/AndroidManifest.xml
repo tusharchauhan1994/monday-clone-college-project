@@ -21,12 +21,13 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".LoginStartActivity"/> <activity android:name=".HomeActivity"/>
+        <activity android:name=".LoginStartActivity"/>
+        <activity android:name=".HomeActivity"/>
         <activity android:name=".MyWorkActivity"/>
         <activity android:name=".AddTaskActivity"/>
-        <activity android:name=".MoreActivity"/>
         <activity android:name=".NotificationsActivity"/>
         <activity android:name=".MoreActivity"/>
+        <activity android:name=".TaskListActivity"/>
 
     </application>
 

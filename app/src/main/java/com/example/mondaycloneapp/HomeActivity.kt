@@ -6,81 +6,69 @@ import android.util.Log
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.mondaycloneapp.models.Board
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
-import com.example.mondaycloneapp.models.Board // Import the new Board blueprint
 
 class HomeActivity : AppCompatActivity() {
 
-    // 1. Initialize Firebase tools outside of onCreate so they can be used anywhere
     private val db = FirebaseDatabase.getInstance().reference
     private val auth = FirebaseAuth.getInstance()
     private lateinit var fabAddTask: FloatingActionButton
+    private lateinit var boardsRecyclerView: RecyclerView
+    private lateinit var boardAdapter: BoardAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 
-        // Find the Floating Action Button (FAB)
         fabAddTask = findViewById(R.id.fab_add_task)
+        boardsRecyclerView = findViewById(R.id.rv_boards)
+        boardsRecyclerView.layoutManager = LinearLayoutManager(this)
 
-        // Set up the four buttons at the bottom (Home, My work, Notifications, More)
         setupBottomNavigation()
 
-        // 2. FAB Click Logic: Show the new options menu
         fabAddTask.setOnClickListener {
-            // Check if the user is actually signed into Firebase
             if (auth.currentUser != null) {
-                // Display the custom menu (Add item / Add Board) using the file we created (DialogFabOptions)
                 DialogFabOptions().show(supportFragmentManager, "FabOptionsDialog")
             } else {
                 Toast.makeText(this, "Please log in to access features.", Toast.LENGTH_SHORT).show()
             }
         }
 
-        // Start loading the list of boards as soon as the screen opens
-        loadRecentlyVisitedBoards()
+        loadBoards()
     }
 
-    /**
-     * This function is publicly available, allowing the dialogs (like DialogFabOptions)
-     * to tell the Home screen to reload its data after a Board or Item is created.
-     */
     fun refreshData() {
         Toast.makeText(this, "Board list refreshed!", Toast.LENGTH_SHORT).show()
-        loadRecentlyVisitedBoards() // Call the loading function again
+        loadBoards()
     }
 
-    /**
-     * Connects to Firebase Realtime Database to retrieve the user's recent Boards in real-time.
-     */
-    private fun loadRecentlyVisitedBoards() {
-        // If no user is logged in (e.g., they haven't finished sign-in), stop here.
+    private fun loadBoards() {
         val userId = auth.currentUser?.uid ?: return
 
-        // 3. Set up a real-time listener to get the top 5 most recently updated Boards
-        db.child("users").child(userId).child("boards")
-            .orderByChild("lastVisitedAt").limitToLast(5)
+        db.child("boards").orderByChild("members/$userId").equalTo(true)
             .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     val boards = snapshot.children.mapNotNull { it.getValue(Board::class.java) }.reversed()
-                    Log.d("HomeActivity", "Loaded ${boards.size} recent boards.")
-
-                    // TODO: The next major step will be to display these 'boards' using a RecyclerView
-                    // in the section called "Recently visited" in activity_home.xml.
+                    boardAdapter = BoardAdapter(boards) { board ->
+                        val intent = Intent(this@HomeActivity, TaskListActivity::class.java)
+                        intent.putExtra("BOARD_ID", board.id)
+                        intent.putExtra("BOARD_NAME", board.name)
+                        startActivity(intent)
+                    }
+                    boardsRecyclerView.adapter = boardAdapter
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    Log.w("HomeActivity", "Failed to load recent boards.", error.toException())
+                    Log.w("HomeActivity", "Failed to load boards.", error.toException())
                 }
             })
     }
 
-
-    /**
-     * Helper function to handle the bottom navigation between different screens.
-     */
     private fun setupBottomNavigation() {
         val btnHome: Button = findViewById(R.id.btn_nav_home)
         val btnMyWork: Button = findViewById(R.id.btn_nav_my_work)
@@ -89,7 +77,6 @@ class HomeActivity : AppCompatActivity() {
 
         fun navigateTo(targetActivity: Class<*>) {
             val intent = Intent(this, targetActivity).apply {
-                // These flags prevent creating too many screens on top of each other
                 flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
             }
             startActivity(intent)

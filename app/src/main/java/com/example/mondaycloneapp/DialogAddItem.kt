@@ -21,7 +21,6 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 
-// Dialog for adding a new Item (Task) within a selected Board and Group.
 class DialogAddItem : DialogFragment() {
 
     private val db = FirebaseDatabase.getInstance().reference
@@ -60,13 +59,12 @@ class DialogAddItem : DialogFragment() {
         tvSelectedGroup = view.findViewById(R.id.tv_selected_group)
         btnSave = view.findViewById(R.id.btn_add_item_save)
 
-        // FIX: Disable the save button by default until data is loaded.
         btnSave.isEnabled = false
 
         view.findViewById<View>(R.id.btn_close).setOnClickListener { dismiss() }
         tvSelectedBoard.setOnClickListener { showBoardSelector() }
         tvSelectedGroup.setOnClickListener { showGroupSelector() }
-        btnSave.setOnClickListener { saveNewItem() }
+        btnSave.setOnClickListener { checkAndSaveNewItem() }
 
         loadBoards()
     }
@@ -74,7 +72,7 @@ class DialogAddItem : DialogFragment() {
     private fun loadBoards() {
         val uid = userId ?: return
 
-        db.child("users").child(uid).child("boards").limitToFirst(10)
+        db.child("boards").orderByChild("members/$uid").equalTo(true)
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     boardsList = snapshot.children.mapNotNull { it.getValue(Board::class.java) }
@@ -97,18 +95,14 @@ class DialogAddItem : DialogFragment() {
     }
 
     private fun loadGroups(boardId: String) {
-        val uid = userId ?: return
-
-        db.child("users").child(uid).child("boards").child(boardId)
-            .child("groups").addListenerForSingleValueEvent(object : ValueEventListener {
+        db.child("groups").orderByChild("boardId").equalTo(boardId)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    Log.d("GroupLoading", "SUCCESS: Query finished. Found ${snapshot.childrenCount} groups.")
                     groupsList = snapshot.children.mapNotNull { it.getValue(Group::class.java) }
 
                     if (groupsList.isNotEmpty()) {
                         selectedGroup = groupsList.first()
                         updateGroupUI()
-                        // FIX: Enable the save button now that we have a default group selected.
                         btnSave.isEnabled = true
                     } else {
                         selectedGroup = null
@@ -128,7 +122,6 @@ class DialogAddItem : DialogFragment() {
         tvSelectedGroup.text = "Select a Group..."
         selectedGroup = null
         groupsList = emptyList()
-        // FIX: Disable the save button while we load new groups.
         btnSave.isEnabled = false
     }
 
@@ -170,42 +163,53 @@ class DialogAddItem : DialogFragment() {
             .setItems(groupNames) { dialog, which ->
                 selectedGroup = groupsList[which]
                 updateGroupUI()
-                // FIX: Enable the save button when the user manually selects a group.
                 btnSave.isEnabled = true
                 dialog.dismiss()
             }
             .show()
     }
 
-    private fun saveNewItem() {
+    private fun checkAndSaveNewItem() {
         val uid = userId
         val itemName = etItemName.text.toString().trim()
 
         if (uid == null || selectedBoard == null || selectedGroup == null || itemName.isEmpty()) {
-            Log.d("SaveItemDebug", "Save failed. Checking conditions:")
-            Log.d("SaveItemDebug", "Is user ID null? ${uid == null}")
-            Log.d("SaveItemDebug", "Is board not selected? ${selectedBoard == null}")
-            Log.d("SaveItemDebug", "Is group not selected? ${selectedGroup == null}")
-            Log.d("SaveItemDebug", "Is item name empty? ${itemName.isEmpty()}")
-
-            Toast.makeText(context, "Please enter an item name and select a Board/Group.", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, "Please fill all fields.", Toast.LENGTH_LONG).show()
             return
         }
 
         val boardId = selectedBoard!!.id
-        val groupId = selectedGroup!!.id
+
+        db.child("items").orderByChild("boardId").equalTo(boardId)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val itemExists = snapshot.children.any { it.getValue(Item::class.java)?.name == itemName }
+
+                    if (itemExists) {
+                        Toast.makeText(context, "An item with this name already exists in this board", Toast.LENGTH_SHORT).show()
+                    } else {
+                        saveNewItem(itemName, uid, boardId, selectedGroup!!.id)
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Toast.makeText(context, "Error checking item: ${error.message}", Toast.LENGTH_SHORT).show()
+                }
+            })
+    }
+
+    private fun saveNewItem(itemName: String, uid: String, boardId: String, groupId: String) {
+        val itemId = db.child("items").push().key!!
 
         val newItem = Item(
+            id = itemId,
             boardId = boardId,
             groupId = groupId,
             name = itemName,
-            userId = uid
+            assignee = uid
         )
 
-        db.child("users").child(uid).child("boards").child(boardId)
-            .child("groups").child(groupId).child("items")
-            .child(newItem.id)
-            .setValue(newItem)
+        db.child("items").child(itemId).setValue(newItem)
             .addOnSuccessListener {
                 Toast.makeText(context, "Item '$itemName' added successfully!", Toast.LENGTH_SHORT).show()
                 dismiss()

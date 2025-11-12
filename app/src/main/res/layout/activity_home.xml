@@ -23,7 +23,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="monday\nwork management"
+            android:text="monday
+work management"
             android:textColor="@android:color/white"
             android:textSize="18sp"
             android:textStyle="bold"/>
@@ -82,26 +83,20 @@
             </FrameLayout>
 
             <TextView
+                android:id="@+id/tv_recently_visited"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Recently visited"
+                android:text="All Boards"
                 android:textColor="@android:color/white"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:layout_marginBottom="16dp"/>
 
-            <TextView
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_boards"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Dashboard and reporting\nMain workspace"
-                android:textColor="@android:color/white"
-                android:layout_marginBottom="16dp"/>
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="My first project\nMain workspace"
-                android:textColor="@android:color/white"
+                tools:listitem="@layout/item_board"
                 android:layout_marginBottom="32dp"/>
 
             <TextView
@@ -168,7 +163,7 @@
             android:text="More"
             android:textColor="#FFFFFF"
             android:drawableTop="@android:drawable/ic_menu_more"
-            android:drawableTint="#FFFFFF"/>
+            android_drawableTint="#FFFFFF"/>
 
     </LinearLayout>
 

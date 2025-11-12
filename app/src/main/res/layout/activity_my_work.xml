@@ -39,55 +39,27 @@
             android:tint="#FFFFFF"/>
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/filter_tabs_layout"
-        android:layout_width="0dp"
+    <TextView
+        android:id="@+id/tv_my_boards"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingHorizontal="16dp"
-        app:layout_constraintTop_toBottomOf="@id/header_layout"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="36dp"
-            android:text="Hide done items"
-            android:backgroundTint="#2D3092"
-            android:textColor="@android:color/white"
-            android:textSize="12sp"
-            android:paddingHorizontal="12dp"
-            android:layout_marginEnd="8dp"/>
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="36dp"
-            android:text="Boards (0)"
-            style="@style/Widget.AppCompat.Button.Borderless"
-            android:background="@drawable/rounded_outline_btn"
-            android:textColor="@android:color/white"
-            android:textSize="12sp"
-            android:paddingHorizontal="12dp"
-            android:layout_marginEnd="8dp"/>
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="36dp"
-            android:text="Following (0)"
-            style="@style/Widget.AppCompat.Button.Borderless"
-            android:background="@drawable/rounded_outline_btn"
-            android:textColor="@android:color/white"
-            android:textSize="12sp"
-            android:paddingHorizontal="12dp"/>
-    </LinearLayout>
+        android:text="My Boards"
+        android:textColor="@android:color/white"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        app:layout_constraintTop_toBottomOf="@+id/header_layout"
+        app:layout_constraintStart_toStartOf="parent"/>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_my_work_items"
+        android:id="@+id/rv_my_work_boards"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:paddingTop="16dp"
-        app:layout_constraintTop_toBottomOf="@id/filter_tabs_layout"
-        app:layout_constraintBottom_toTopOf="@id/bottom_navigation"
+        app:layout_constraintTop_toBottomOf="@+id/tv_my_boards"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_navigation"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

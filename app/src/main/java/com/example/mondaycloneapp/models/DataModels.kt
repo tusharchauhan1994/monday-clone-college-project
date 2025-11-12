@@ -1,46 +1,47 @@
 package com.example.mondaycloneapp.models
 
-import java.util.UUID
-
 // --- CORE DATA MODELS FOR MONDAY CLONE ---
 
 /**
- * Represents a Board (Project/Workspace). This is the top-level container for Groups and Items.
- * A Board can be a "Recently visited" item on the Home screen.
+ * Represents a User profile.
  */
-data class Board(
-    val id: String = UUID.randomUUID().toString(), // Unique ID for this board
-    val userId: String = "", // Who owns this board
-    val name: String = "New Board",
-    val description: String? = null,
-    val createdAt: Long = System.currentTimeMillis(),
-    val lastVisitedAt: Long = System.currentTimeMillis() // To sort in "Recently visited"
+data class User(
+    val id: String = "",
+    val name: String = "",
+    val email: String = ""
 )
 
 /**
- * Represents a Group within a Board (e.g., "To Do", "Done", "Group Title").
+ * Represents a Board (Project/Workspace).
+ */
+data class Board(
+    val id: String = "",
+    val name: String = "New Board",
+    val ownerId: String = "",
+    val members: Map<String, Boolean> = emptyMap()
+)
+
+/**
+ * Represents a Group within a Board.
  */
 data class Group(
-    val id: String = UUID.randomUUID().toString(), // Unique ID for this group
-    val boardId: String = "", // Which board this group belongs to
+    val id: String = "",
+    val boardId: String = "",
     val name: String = "New Group",
-    val orderIndex: Int = 0 // Used for vertical sorting of groups
+    val orderIndex: Int = 0
 )
 
 /**
  * Represents an Item (Task) within a Group.
- * This holds the dynamic column data shown in the table view (Status, Person, Date, etc.).
  */
 data class Item(
-    val id: String = UUID.randomUUID().toString(), // Unique ID for this item
-    val userId: String = "", // Who owns/created this item
-    val boardId: String = "", // Which board this item is in
-    val groupId: String = "", // Which group this item is in
-    val name: String = "New Item", // The main text for the task, e.g., "Tushar"
-    val updates: Int = 0,
-    val person: String? = null, // User ID or name assigned to the task
-    val status: String = "Working on it", // Default status, must match StatusOptions
-    val date: Long? = null, // Date in milliseconds
+    val id: String = "",
+    val boardId: String = "",
+    val groupId: String = "",
+    val name: String = "New Item",
+    val status: String = "Working on it",
+    val assignee: String? = null, // User ID assigned to the task
+    val dueDate: String? = null, // Date as String "YYYY-MM-DD"
     val createdAt: Long = System.currentTimeMillis()
 )
 

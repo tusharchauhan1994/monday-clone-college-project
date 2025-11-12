@@ -4,148 +4,67 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
-import android.widget.EditText
-import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.mondaycloneapp.models.Item
+import com.example.mondaycloneapp.models.Board
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 
-class MyWorkActivity : AppCompatActivity(), ItemAdapter.OnItemClickListener { // Implement the listener
+class MyWorkActivity : AppCompatActivity() {
 
-    private lateinit var rvItems: RecyclerView
-    private lateinit var itemAdapter: ItemAdapter
+    private lateinit var rvBoards: RecyclerView
+    private lateinit var boardAdapter: BoardAdapter
     private val db = FirebaseDatabase.getInstance().reference
     private val auth = FirebaseAuth.getInstance()
-    private var itemsList = mutableListOf<Item>()
+    private var boardsList = mutableListOf<Board>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_my_work)
 
-        // 1. FAB Logic - Now it shows our modern dialog
         val fabAddTask: FloatingActionButton = findViewById(R.id.fab_add_task)
         fabAddTask.setOnClickListener {
             DialogAddItem().show(supportFragmentManager, "AddItemDialog")
         }
 
-        // 2. Set up the RecyclerView
-        rvItems = findViewById(R.id.rv_my_work_items)
-        rvItems.layoutManager = LinearLayoutManager(this)
+        rvBoards = findViewById(R.id.rv_my_work_boards)
+        rvBoards.layoutManager = LinearLayoutManager(this)
 
-        // Initialize the adapter with an empty list and the listener
-        itemAdapter = ItemAdapter(itemsList, this)
-        rvItems.adapter = itemAdapter
+        loadBoards()
 
-        // 3. Load the items from Realtime Database
-        loadItems()
-
-        // 4. Set up Bottom Navigation
         setupBottomNavigation()
     }
 
-    private fun loadItems() {
+    private fun loadBoards() {
         val userId = auth.currentUser?.uid ?: return
 
-        val userRef = db.child("users").child(userId)
-        userRef.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                itemsList.clear()
-                val boardsSnapshot = snapshot.child("boards")
-                for (boardSnapshot in boardsSnapshot.children) {
-                    val groupsSnapshot = boardSnapshot.child("groups")
-                    for (groupSnapshot in groupsSnapshot.children) {
-                        val itemsSnapshot = groupSnapshot.child("items")
-                        for (itemSnapshot in itemsSnapshot.children) {
-                            val item = itemSnapshot.getValue(Item::class.java)
-                            if (item != null) {
-                                itemsList.add(item)
-                            }
+        db.child("boards").orderByChild("ownerId").equalTo(userId)
+            .addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    boardsList.clear()
+                    for (boardSnapshot in snapshot.children) {
+                        val board = boardSnapshot.getValue(Board::class.java)
+                        if (board != null) {
+                            boardsList.add(board)
                         }
                     }
+                    boardAdapter = BoardAdapter(boardsList) { board ->
+                        val intent = Intent(this@MyWorkActivity, TaskListActivity::class.java)
+                        intent.putExtra("BOARD_ID", board.id)
+                        intent.putExtra("BOARD_NAME", board.name)
+                        startActivity(intent)
+                    }
+                    rvBoards.adapter = boardAdapter
+                    Log.d("MyWorkActivity", "Successfully loaded ${boardsList.size} boards.")
                 }
-                itemAdapter.notifyDataSetChanged()
-                Log.d("MyWorkActivity", "Successfully loaded ${itemsList.size} items.")
-            }
 
-            override fun onCancelled(error: DatabaseError) {
-                Log.e("MyWorkActivity", "Error loading items", error.toException())
-            }
-        })
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e("MyWorkActivity", "Error loading boards", error.toException())
+                }
+            })
     }
-
-    // Function to show a dialog for updating an item's name
-    private fun showUpdateDialog(item: Item) {
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle("Update Item Name")
-
-        val input = EditText(this)
-        input.setText(item.name)
-        builder.setView(input)
-
-        builder.setPositiveButton("Update") { dialog, _ ->
-            val newName = input.text.toString().trim()
-            if (newName.isNotEmpty()) {
-                updateItemName(item, newName)
-            } else {
-                Toast.makeText(this, "Item name cannot be empty", Toast.LENGTH_SHORT).show()
-            }
-            dialog.dismiss()
-        }
-        builder.setNegativeButton("Cancel") { dialog, _ -> dialog.cancel() }
-
-        builder.show()
-    }
-
-    // Function to update the item's name in Realtime Database
-    private fun updateItemName(item: Item, newName: String) {
-        val itemRef = db.child("users").child(item.userId).child("boards").child(item.boardId).child("groups").child(item.groupId).child("items").child(item.id)
-
-        itemRef.child("name").setValue(newName)
-            .addOnSuccessListener {
-                Toast.makeText(this, "Item updated successfully", Toast.LENGTH_SHORT).show()
-            }
-            .addOnFailureListener { e ->
-                Toast.makeText(this, "Error updating item: ${e.message}", Toast.LENGTH_LONG).show()
-                Log.e("MyWorkActivity", "Error updating item", e)
-            }
-    }
-
-    // Function to delete an item from Realtime Database
-    private fun deleteItem(item: Item) {
-        val itemRef = db.child("users").child(item.userId).child("boards").child(item.boardId).child("groups").child(item.groupId).child("items").child(item.id)
-
-        itemRef.removeValue()
-            .addOnSuccessListener {
-                Toast.makeText(this, "Item deleted successfully", Toast.LENGTH_SHORT).show()
-            }
-            .addOnFailureListener { e ->
-                Toast.makeText(this, "Error deleting item: ${e.message}", Toast.LENGTH_LONG).show()
-                Log.e("MyWorkActivity", "Error deleting item", e)
-            }
-    }
-
-    // Handle item click for updating
-    override fun onItemClick(item: Item) {
-        showUpdateDialog(item)
-    }
-
-    // Handle item long click for deleting
-    override fun onItemLongClick(item: Item) {
-        AlertDialog.Builder(this)
-            .setTitle("Delete Item")
-            .setMessage("Are you sure you want to delete this item?")
-            .setPositiveButton("Delete") { _, _ ->
-                deleteItem(item)
-            }
-            .setNegativeButton("Cancel", null)
-            .show()
-    }
-
 
     private fun setupBottomNavigation() {
         val btnHome: Button = findViewById(R.id.btn_nav_home)
