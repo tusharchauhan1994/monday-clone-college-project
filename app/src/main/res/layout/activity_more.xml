@@ -58,17 +58,20 @@
 
             <TextView
                 style="@style/MenuItemStyle"
-                android:text="Update Feed\n0 new updates"
+                android:text="Update Feed
+0 new updates"
                 android:drawableLeft="@android:drawable/ic_menu_send"/>
 
             <TextView
                 style="@style/MenuItemStyle"
-                android:text="My team\n1 contacts"
+                android:text="My team
+1 contacts"
                 android:drawableLeft="@android:drawable/ic_menu_crop"/>
 
             <TextView
                 style="@style/MenuItemStyle"
-                android:text="Search everywhere\nFind anything in the app"
+                android:text="Search everywhere
+Find anything in the app"
                 android:drawableLeft="@android:drawable/ic_menu_search"/>
 
             <TextView
@@ -99,6 +102,13 @@
                 android:text="Language"
                 android:drawableLeft="@android:drawable/ic_menu_compass"
                 android:drawableRight="@android:drawable/ic_menu_directions"
+                android:textAlignment="viewStart"/>
+
+            <TextView
+                android:id="@+id/tv_logout"
+                style="@style/MenuItemStyle"
+                android:text="Logout"
+                android:drawableLeft="@android:drawable/ic_lock_power_off"
                 android:textAlignment="viewStart"/>
 
         </LinearLayout>
