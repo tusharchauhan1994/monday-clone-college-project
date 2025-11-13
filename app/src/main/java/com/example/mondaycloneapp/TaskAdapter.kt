@@ -89,7 +89,7 @@ class TaskAdapter(private val listItems: List<ListItem>, private val listener: O
             task.assignee?.let { userId ->
                 db.child("users").child(userId).get().addOnSuccessListener {
                     val user = it.getValue(User::class.java)
-                    taskAssignee.text = user?.name ?: "Unassigned"
+                    taskAssignee.text = user?.email ?: "Unassigned"
                 }
             } ?: run {
                 taskAssignee.text = "Unassigned"
