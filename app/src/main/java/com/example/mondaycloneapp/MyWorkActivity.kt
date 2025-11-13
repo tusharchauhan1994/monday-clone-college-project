@@ -3,7 +3,10 @@ package com.example.mondaycloneapp
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.EditText
 import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -50,11 +53,14 @@ class MyWorkActivity : AppCompatActivity() {
                             boardsList.add(board)
                         }
                     }
-                    boardAdapter = BoardAdapter(boardsList) { board ->
+                    boardAdapter = BoardAdapter(this@MyWorkActivity, boardsList, {
+                        board ->
                         val intent = Intent(this@MyWorkActivity, TaskListActivity::class.java)
                         intent.putExtra("BOARD_ID", board.id)
                         intent.putExtra("BOARD_NAME", board.name)
                         startActivity(intent)
+                    }) { board ->
+                        showBoardOptionsDialog(board)
                     }
                     rvBoards.adapter = boardAdapter
                     Log.d("MyWorkActivity", "Successfully loaded ${boardsList.size} boards.")
@@ -64,6 +70,75 @@ class MyWorkActivity : AppCompatActivity() {
                     Log.e("MyWorkActivity", "Error loading boards", error.toException())
                 }
             })
+    }
+
+    private fun showBoardOptionsDialog(board: Board) {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_board_options, null)
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .create()
+
+        dialogView.findViewById<TextView>(R.id.tv_rename_board).setOnClickListener {
+            dialog.dismiss()
+            showRenameBoardDialog(board)
+        }
+
+        dialogView.findViewById<TextView>(R.id.tv_delete_board).setOnClickListener {
+            dialog.dismiss()
+            showDeleteBoardConfirmationDialog(board)
+        }
+
+        dialog.show()
+    }
+
+    private fun showRenameBoardDialog(board: Board) {
+        val editText = EditText(this)
+        editText.setText(board.name)
+
+        AlertDialog.Builder(this)
+            .setTitle("Rename Board")
+            .setView(editText)
+            .setPositiveButton("Rename") { _, _ ->
+                val newName = editText.text.toString()
+                if (newName.isNotEmpty()) {
+                    renameBoard(board, newName)
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun renameBoard(board: Board, newName: String) {
+        db.child("boards").child(board.id).child("name").setValue(newName)
+    }
+
+    private fun showDeleteBoardConfirmationDialog(board: Board) {
+        AlertDialog.Builder(this)
+            .setTitle("Delete Board")
+            .setMessage("Are you sure you want to delete this board and all its tasks?")
+            .setPositiveButton("Delete") { _, _ ->
+                deleteBoard(board)
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun deleteBoard(board: Board) {
+        val boardId = board.id
+        // Delete all tasks associated with the board
+        db.child("tasks").orderByChild("boardId").equalTo(boardId).addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                for (taskSnapshot in snapshot.children) {
+                    taskSnapshot.ref.removeValue()
+                }
+                // Delete the board itself
+                db.child("boards").child(boardId).removeValue()
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("MyWorkActivity", "Error deleting tasks for board", error.toException())
+            }
+        })
     }
 
     private fun setupBottomNavigation() {

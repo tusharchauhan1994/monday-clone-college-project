@@ -1,5 +1,6 @@
 package com.example.mondaycloneapp
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,8 +11,10 @@ import com.example.mondaycloneapp.models.Board
 import java.util.concurrent.TimeUnit
 
 class BoardAdapter(
+    private val context: Context,
     private val boards: List<Board>,
-    private val onBoardClick: (Board) -> Unit
+    private val onBoardClick: (Board) -> Unit,
+    private val onBoardLongClick: (Board) -> Unit
 ) : RecyclerView.Adapter<BoardAdapter.BoardViewHolder>() {
 
     inner class BoardViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -26,6 +29,11 @@ class BoardAdapter(
 
             itemView.setOnClickListener {
                 onBoardClick(board)
+            }
+
+            itemView.setOnLongClickListener {
+                onBoardLongClick(board)
+                true
             }
 
             starIcon.setOnClickListener {
