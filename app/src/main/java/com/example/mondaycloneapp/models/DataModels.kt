@@ -41,6 +41,7 @@ data class Item(
     val groupId: String = "",
     val name: String = "New Item",
     val status: String = "Working on it",
+    val priority: String = "Medium",
     val assignee: String? = null, // User ID assigned to the task
     val dueDate: String? = null, // Date as String "YYYY-MM-DD"
     val createdAt: Long = System.currentTimeMillis()
@@ -53,4 +54,13 @@ object StatusOptions {
     const val DONE = "Done"
 
     val ALL_STATUSES = listOf(WORKING_ON_IT, STUCK, DONE)
+}
+
+// --- Utility: Priority Options ---
+object PriorityOptions {
+    const val HIGH = "High"
+    const val MEDIUM = "Medium"
+    const val LOW = "Low"
+
+    val ALL_PRIORITIES = listOf(HIGH, MEDIUM, LOW)
 }
