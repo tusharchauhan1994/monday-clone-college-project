@@ -13,7 +13,11 @@ import android.widget.Toast
 import com.example.mondaycloneapp.models.Item
 import com.example.mondaycloneapp.models.PriorityOptions
 import com.example.mondaycloneapp.models.StatusOptions
+import com.example.mondaycloneapp.models.User
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import java.util.Calendar
 
 class UpdateTaskActivity : AppCompatActivity() {
@@ -27,6 +31,9 @@ class UpdateTaskActivity : AppCompatActivity() {
     private lateinit var updateDueDate: TextView
     private lateinit var saveItemButton: Button
     private lateinit var deleteItemButton: Button
+
+    private val users = mutableListOf<User>()
+    private val userEmails = mutableListOf<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,6 +66,8 @@ class UpdateTaskActivity : AppCompatActivity() {
             updatePriority.setSelection(priorityPosition)
         }
 
+        fetchUsers()
+
         updateDueDate.setOnClickListener {
             showDatePickerDialog()
         }
@@ -70,8 +79,37 @@ class UpdateTaskActivity : AppCompatActivity() {
         deleteItemButton.setOnClickListener {
             deleteItem()
         }
+    }
 
-        // TODO: Populate assignee AutoCompleteTextView with users from Firebase
+    private fun fetchUsers() {
+        val usersRef = FirebaseDatabase.getInstance().getReference("users")
+        usersRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                users.clear()
+                userEmails.clear()
+                for (userSnapshot in snapshot.children) {
+                    val user = userSnapshot.getValue(User::class.java)
+                    if (user != null) {
+                        val userWithId = user.copy(id = userSnapshot.key!!)
+                        users.add(userWithId)
+                        userEmails.add(userWithId.email)
+                    }
+                }
+                val adapter = ArrayAdapter(this@UpdateTaskActivity, android.R.layout.simple_dropdown_item_1line, userEmails)
+                updateAssignee.setAdapter(adapter)
+
+                item.assignee?.let { assigneeId ->
+                    val assignedUser = users.find { it.id == assigneeId }
+                    assignedUser?.let {
+                        updateAssignee.setText(it.email, false)
+                    }
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Toast.makeText(this@UpdateTaskActivity, "Failed to load users", Toast.LENGTH_SHORT).show()
+            }
+        })
     }
 
     private fun showDatePickerDialog() {
@@ -89,10 +127,14 @@ class UpdateTaskActivity : AppCompatActivity() {
     }
 
     private fun updateItemInDatabase() {
+        val assignedUserEmail = updateAssignee.text.toString()
+        val assignedUser = users.find { it.email == assignedUserEmail }
+
         val updatedItem = item.copy(
             name = updateItemName.text.toString(),
             status = updateStatus.selectedItem.toString(),
             priority = updatePriority.selectedItem.toString(),
+            assignee = assignedUser?.id,
             dueDate = updateDueDate.text.toString()
         )
 
@@ -100,12 +142,20 @@ class UpdateTaskActivity : AppCompatActivity() {
             .child(item.id)
             .setValue(updatedItem)
             .addOnSuccessListener {
+                if (assignedUser != null) {
+                    addMemberToBoard(assignedUser.id)
+                }
                 Toast.makeText(this, "Item updated successfully", Toast.LENGTH_SHORT).show()
                 finish()
             }
             .addOnFailureListener {
                 Toast.makeText(this, "Failed to update item", Toast.LENGTH_SHORT).show()
             }
+    }
+
+    private fun addMemberToBoard(userId: String) {
+        val boardRef = FirebaseDatabase.getInstance().getReference("boards").child(item.boardId)
+        boardRef.child("members").child(userId).setValue(true)
     }
 
     private fun deleteItem() {

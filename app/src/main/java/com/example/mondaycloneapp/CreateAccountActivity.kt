@@ -6,7 +6,9 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.mondaycloneapp.models.User
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 
 class CreateAccountActivity : AppCompatActivity() {
 
@@ -42,12 +44,18 @@ class CreateAccountActivity : AppCompatActivity() {
                 .addOnCompleteListener(this) { task ->
                     if (task.isSuccessful) {
                         // Sign in success, update UI with the signed-in user's information
-                        val user = auth.currentUser
-                        Toast.makeText(baseContext, "Authentication success.",
-                            Toast.LENGTH_SHORT).show()
-                        // Navigate to your main activity or another appropriate screen
-                        startActivity(Intent(this, HomeActivity::class.java))
-                        finish()
+                        val firebaseUser = auth.currentUser
+                        val user = User(id = firebaseUser!!.uid, name = firebaseUser.displayName ?: "", email = firebaseUser.email!!)
+                        FirebaseDatabase.getInstance().getReference("users")
+                            .child(firebaseUser.uid)
+                            .setValue(user)
+                            .addOnCompleteListener { 
+                                Toast.makeText(baseContext, "Authentication success.",
+                                    Toast.LENGTH_SHORT).show()
+                                // Navigate to your main activity or another appropriate screen
+                                startActivity(Intent(this, HomeActivity::class.java))
+                                finish()
+                            }
                     } else {
                         // If sign in fails, display a message to the user.
                         Toast.makeText(baseContext, "Authentication failed.",
