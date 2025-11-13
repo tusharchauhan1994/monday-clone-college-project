@@ -1,5 +1,6 @@
 package com.example.mondaycloneapp
 
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,7 +15,6 @@ class ItemAdapter(
 
     // Interface to handle click events in the hosting activity
     interface OnItemClickListener {
-        fun onItemClick(item: Item)
         fun onItemLongClick(item: Item)
     }
 
@@ -31,7 +31,11 @@ class ItemAdapter(
         override fun onClick(v: View?) {
             val position = adapterPosition
             if (position != RecyclerView.NO_POSITION) {
-                listener.onItemClick(items[position])
+                val item = items[position]
+                val context = v?.context
+                val intent = Intent(context, UpdateTaskActivity::class.java)
+                intent.putExtra("item", item)
+                context?.startActivity(intent)
             }
         }
 

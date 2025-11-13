@@ -2,6 +2,8 @@ package com.example.mondaycloneapp
 
 import android.os.Bundle
 import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -9,7 +11,7 @@ import com.example.mondaycloneapp.models.Group
 import com.example.mondaycloneapp.models.Item
 import com.google.firebase.database.*
 
-class TaskListActivity : AppCompatActivity() {
+class TaskListActivity : AppCompatActivity(), TaskAdapter.OnItemClickListener {
 
     private lateinit var boardId: String
     private lateinit var boardName: String
@@ -70,7 +72,28 @@ class TaskListActivity : AppCompatActivity() {
             }
         }
 
-        taskAdapter = TaskAdapter(listItems)
+        taskAdapter = TaskAdapter(listItems, this)
         tasksRecyclerView.adapter = taskAdapter
+    }
+
+    override fun onItemLongClick(item: Item) {
+        AlertDialog.Builder(this)
+            .setTitle("Delete Item")
+            .setMessage("Are you sure you want to delete this item?")
+            .setPositiveButton("Delete") { _, _ ->
+                deleteItem(item)
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun deleteItem(item: Item) {
+        db.child("items").child(item.id).removeValue()
+            .addOnSuccessListener {
+                Toast.makeText(this, "Item deleted", Toast.LENGTH_SHORT).show()
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Failed to delete item", Toast.LENGTH_SHORT).show()
+            }
     }
 }

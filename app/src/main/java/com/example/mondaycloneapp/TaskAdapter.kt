@@ -1,5 +1,6 @@
 package com.example.mondaycloneapp
 
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,7 +18,11 @@ sealed class ListItem {
     data class TaskItem(val task: Item) : ListItem()
 }
 
-class TaskAdapter(private val listItems: List<ListItem>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class TaskAdapter(private val listItems: List<ListItem>, private val listener: OnItemClickListener) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+    interface OnItemClickListener {
+        fun onItemLongClick(item: Item)
+    }
 
     override fun getItemViewType(position: Int): Int {
         return when (listItems[position]) {
@@ -41,7 +46,7 @@ class TaskAdapter(private val listItems: List<ListItem>) : RecyclerView.Adapter<
         if (holder is GroupViewHolder && listItem is ListItem.GroupHeader) {
             holder.bind(listItem)
         } else if (holder is TaskViewHolder && listItem is ListItem.TaskItem) {
-            holder.bind(listItem.task)
+            holder.bind(listItem.task, listener)
         }
     }
 
@@ -63,11 +68,23 @@ class TaskAdapter(private val listItems: List<ListItem>) : RecyclerView.Adapter<
         private val taskDueDate: TextView = itemView.findViewById(R.id.task_due_date)
         private val db = FirebaseDatabase.getInstance().reference
 
-        fun bind(task: Item) {
+        fun bind(task: Item, listener: OnItemClickListener) {
             taskName.text = task.name
             taskPriority.text = task.priority
             taskStatus.text = task.status
             taskDueDate.text = task.dueDate
+
+            itemView.setOnClickListener {
+                val context = it.context
+                val intent = Intent(context, UpdateTaskActivity::class.java)
+                intent.putExtra("item", task)
+                context.startActivity(intent)
+            }
+
+            itemView.setOnLongClickListener {
+                listener.onItemLongClick(task)
+                true
+            }
 
             task.assignee?.let { userId ->
                 db.child("users").child(userId).get().addOnSuccessListener {
