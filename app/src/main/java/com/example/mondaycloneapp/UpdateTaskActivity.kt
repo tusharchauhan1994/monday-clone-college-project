@@ -11,6 +11,7 @@ import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import com.example.mondaycloneapp.models.Item
+import com.example.mondaycloneapp.models.PriorityOptions
 import com.example.mondaycloneapp.models.StatusOptions
 import com.google.firebase.database.FirebaseDatabase
 import java.util.Calendar
@@ -22,6 +23,7 @@ class UpdateTaskActivity : AppCompatActivity() {
     private lateinit var updateItemName: EditText
     private lateinit var updateAssignee: AutoCompleteTextView
     private lateinit var updateStatus: Spinner
+    private lateinit var updatePriority: Spinner
     private lateinit var updateDueDate: TextView
     private lateinit var saveItemButton: Button
     private lateinit var deleteItemButton: Button
@@ -35,6 +37,7 @@ class UpdateTaskActivity : AppCompatActivity() {
         updateItemName = findViewById(R.id.update_item_name)
         updateAssignee = findViewById(R.id.update_assignee)
         updateStatus = findViewById(R.id.update_status)
+        updatePriority = findViewById(R.id.update_priority)
         updateDueDate = findViewById(R.id.update_due_date)
         saveItemButton = findViewById(R.id.save_item_button)
         deleteItemButton = findViewById(R.id.delete_item_button)
@@ -47,6 +50,13 @@ class UpdateTaskActivity : AppCompatActivity() {
         val statusPosition = StatusOptions.ALL_STATUSES.indexOf(item.status)
         if (statusPosition != -1) {
             updateStatus.setSelection(statusPosition)
+        }
+
+        val priorityAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, PriorityOptions.ALL_PRIORITIES)
+        updatePriority.adapter = priorityAdapter
+        val priorityPosition = PriorityOptions.ALL_PRIORITIES.indexOf(item.priority)
+        if (priorityPosition != -1) {
+            updatePriority.setSelection(priorityPosition)
         }
 
         updateDueDate.setOnClickListener {
@@ -82,6 +92,7 @@ class UpdateTaskActivity : AppCompatActivity() {
         val updatedItem = item.copy(
             name = updateItemName.text.toString(),
             status = updateStatus.selectedItem.toString(),
+            priority = updatePriority.selectedItem.toString(),
             dueDate = updateDueDate.text.toString()
         )
 
