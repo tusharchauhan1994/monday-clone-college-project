@@ -3,6 +3,7 @@
     <string name="default_web_client_id">YOUR_FIREBASE_WEB_CLIENT_ID_HERE</string>
     <string name="profile_initial_placeholder">TC</string>
     <string name="user_name_placeholder">Tushar Chauhan</string>
+    <string name="user_email_placeholder">tushar.chauhan@example.com</string>
     <string name="view_profile">View Profile</string>
     <string name="navigation">Navigation</string>
     <string name="update_feed">Update Feed\n0 new updates</string>

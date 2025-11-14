@@ -19,6 +19,7 @@ class MoreActivity : AppCompatActivity() {
     private lateinit var googleSignInClient: GoogleSignInClient
 
     private lateinit var tvUserName: TextView
+    private lateinit var tvUserEmail: TextView
     private lateinit var tvProfileInitial: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,6 +35,7 @@ class MoreActivity : AppCompatActivity() {
         googleSignInClient = GoogleSignIn.getClient(this, gso)
 
         tvUserName = findViewById(R.id.tv_user_name)
+        tvUserEmail = findViewById(R.id.tv_user_email)
         tvProfileInitial = findViewById(R.id.tv_profile_initial)
         val tvViewProfile: TextView = findViewById(R.id.tv_view_profile)
 
@@ -96,6 +98,8 @@ class MoreActivity : AppCompatActivity() {
                 tvUserName.text = "User"
                 tvProfileInitial.text = "U"
             }
+
+            tvUserEmail.text = userEmail ?: ""
         }
     }
 
