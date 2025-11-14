@@ -1,4 +1,20 @@
 <resources>
     <string name="app_name">MondayCloneApp</string>
     <string name="default_web_client_id">YOUR_FIREBASE_WEB_CLIENT_ID_HERE</string>
+    <string name="profile_initial_placeholder">TC</string>
+    <string name="user_name_placeholder">Tushar Chauhan</string>
+    <string name="view_profile">View Profile</string>
+    <string name="navigation">Navigation</string>
+    <string name="update_feed">Update Feed\n0 new updates</string>
+    <string name="my_team">My team\n1 contacts</string>
+    <string name="search_everywhere">Search everywhere\nFind anything</string>
+    <string name="settings">Settings</string>
+    <string name="account">Account</string>
+    <string name="notification_settings">Notification settings</string>
+    <string name="language">Language</string>
+    <string name="logout">Logout</string>
+    <string name="home">Home</string>
+    <string name="my_work">My Work</string>
+    <string name="notifications">Notifications</string>
+    <string name="more">More</string>
 </resources>

@@ -21,96 +21,154 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="20dp">
 
+            <!-- PROFILE CARD -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:gravity="center_horizontal"
-                android:paddingVertical="16dp"
-                android:layout_marginBottom="32dp">
+                android:background="#1E1F23"
+                android:padding="24dp"
+                android:layout_marginBottom="32dp"
+                android:paddingTop="32dp"
+                android:paddingBottom="32dp">
 
                 <TextView
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:text="TC"
+                    android:id="@+id/tv_profile_initial"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:text="@string/profile_initial_placeholder"
+                    android:gravity="center"
                     android:textColor="@android:color/white"
                     android:textSize="30sp"
-                    android:gravity="center"
                     android:background="@drawable/rounded_blue_bg"
-                    android:layout_marginBottom="8dp"/>
+                    android:layout_marginBottom="12dp"/>
 
                 <TextView
+                    android:id="@+id/tv_user_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Tushar Chauhan"
+                    android:text="@string/user_name_placeholder"
                     android:textColor="@android:color/white"
                     android:textSize="20sp"
                     android:textStyle="bold"/>
 
                 <TextView
+                    android:id="@+id/tv_view_profile"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="View Profile"
+                    android:text="@string/view_profile"
                     android:textColor="#595DFF"
-                    android:textSize="14sp"/>
+                    android:textSize="14sp"
+                    android:layout_marginTop="4dp"/>
             </LinearLayout>
 
+            <!-- NAVIGATION SECTION TITLE -->
             <TextView
-                style="@style/MenuItemStyle"
-                android:text="Update Feed\n0 new updates"
-                android:drawableLeft="@android:drawable/ic_menu_send"/>
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/navigation"
+                android:textColor="#888888"
+                android:textSize="14sp"
+                android:layout_marginBottom="10dp"/>
 
-            <TextView
-                style="@style/MenuItemStyle"
-                android:text="My team\n1 contacts"
-                android:drawableLeft="@android:drawable/ic_menu_crop"/>
-
-            <TextView
-                style="@style/MenuItemStyle"
-                android:text="Search everywhere\nFind anything in the app"
-                android:drawableLeft="@android:drawable/ic_menu_search"/>
-
-            <TextView
+            <!-- NAVIGATION MENU ITEMS -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Settings"
-                android:textColor="#AAAAAA"
-                android:textSize="16sp"
-                android:layout_marginTop="32dp"
-                android:layout_marginBottom="16dp"/>
+                android:orientation="vertical"
+                android:background="#1E1F23"
+                android:paddingVertical="8dp">
 
+                <TextView
+                    style="@style/MenuItemStyle"
+                    android:text="@string/update_feed"
+                    app:drawableStartCompat="@android:drawable/ic_menu_send"
+                    android:paddingVertical="14dp"/>
+
+                <View android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#222222"/>
+
+                <TextView
+                    style="@style/MenuItemStyle"
+                    android:text="@string/my_team"
+                    app:drawableStartCompat="@android:drawable/ic_menu_myplaces"
+                    android:paddingVertical="14dp"/>
+
+                <View android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#222222"/>
+
+                <TextView
+                    style="@style/MenuItemStyle"
+                    android:text="@string/search_everywhere"
+                    app:drawableStartCompat="@android:drawable/ic_menu_search"
+                    android:paddingVertical="14dp"/>
+            </LinearLayout>
+
+            <!-- SETTINGS SECTION TITLE -->
             <TextView
-                style="@style/MenuItemStyle"
-                android:text="Account"
-                android:drawableLeft="@android:drawable/ic_menu_slideshow"
-                android:drawableRight="@android:drawable/ic_menu_directions"
-                android:textAlignment="viewStart"/>
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/settings"
+                android:textColor="#888888"
+                android:textSize="14sp"
+                android:layout_marginTop="28dp"
+                android:layout_marginBottom="10dp"/>
 
-            <TextView
-                style="@style/MenuItemStyle"
-                android:text="Notification settings"
-                android:drawableLeft="@android:drawable/ic_menu_manage"
-                android:drawableRight="@android:drawable/ic_menu_directions"
-                android:textAlignment="viewStart"/>
+            <!-- SETTINGS MENU ITEMS -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="#1E1F23"
+                android:paddingVertical="8dp">
 
-            <TextView
-                style="@style/MenuItemStyle"
-                android:text="Language"
-                android:drawableLeft="@android:drawable/ic_menu_compass"
-                android:drawableRight="@android:drawable/ic_menu_directions"
-                android:textAlignment="viewStart"/>
+                <TextView
+                    style="@style/MenuItemStyle"
+                    android:text="@string/account"
+                    app:drawableStartCompat="@android:drawable/ic_menu_manage"
+                    app:drawableEndCompat="@android:drawable/ic_media_next"
+                    android:paddingVertical="14dp"/>
 
+                <View android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#222222"/>
+
+                <TextView
+                    style="@style/MenuItemStyle"
+                    android:text="@string/notification_settings"
+                    app:drawableStartCompat="@android:drawable/ic_menu_agenda"
+                    app:drawableEndCompat="@android:drawable/ic_media_next"
+                    android:paddingVertical="14dp"/>
+
+                <View android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#222222"/>
+
+                <TextView
+                    style="@style/MenuItemStyle"
+                    android:text="@string/language"
+                    app:drawableStartCompat="@android:drawable/ic_menu_compass"
+                    app:drawableEndCompat="@android:drawable/ic_media_next"
+                    android:paddingVertical="14dp"/>
+            </LinearLayout>
+
+            <!-- LOGOUT -->
             <TextView
                 android:id="@+id/tv_logout"
                 style="@style/MenuItemStyle"
-                android:text="Logout"
-                android:drawableLeft="@android:drawable/ic_lock_power_off"
-                android:textAlignment="viewStart"/>
-
+                android:text="@string/logout"
+                app:drawableStartCompat="@android:drawable/ic_lock_power_off"
+                android:textColor="#FF5555"
+                android:paddingVertical="18dp"
+                android:layout_marginTop="20dp"/>
         </LinearLayout>
     </ScrollView>
+
 
     <LinearLayout
         android:id="@+id/bottom_navigation"
@@ -123,7 +181,8 @@
         android:elevation="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        android:baselineAligned="false">
 
         <LinearLayout
             android:id="@+id/btn_nav_home"
@@ -139,13 +198,14 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@android:drawable/ic_menu_myplaces"
-                android:tint="#888888"
-                android:layout_marginBottom="4dp"/>
+                app:tint="#888888"
+                android:layout_marginBottom="4dp"
+                android:contentDescription="@string/home" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Home"
+                android:text="@string/home"
                 android:textColor="#888888"
                 android:textSize="12sp"/>
         </LinearLayout>
@@ -164,13 +224,14 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@android:drawable/ic_menu_agenda"
-                android:tint="#888888"
-                android:layout_marginBottom="4dp"/>
+                app:tint="#888888"
+                android:layout_marginBottom="4dp"
+                android:contentDescription="@string/my_work" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="My Work"
+                android:text="@string/my_work"
                 android:textColor="#888888"
                 android:textSize="12sp"/>
         </LinearLayout>
@@ -189,13 +250,14 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@android:drawable/ic_popup_reminder"
-                android:tint="#888888"
-                android:layout_marginBottom="4dp"/>
+                app:tint="#888888"
+                android:layout_marginBottom="4dp"
+                android:contentDescription="@string/notifications" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Notifications"
+                android:text="@string/notifications"
                 android:textColor="#888888"
                 android:textSize="12sp"/>
         </LinearLayout>
@@ -214,13 +276,14 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@android:drawable/ic_menu_more"
-                android:tint="#595DFF"
-                android:layout_marginBottom="4dp"/>
+                app:tint="#595DFF"
+                android:layout_marginBottom="4dp"
+                android:contentDescription="@string/more" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="More"
+                android:text="@string/more"
                 android:textColor="#595DFF"
                 android:textSize="12sp"/>
         </LinearLayout>
