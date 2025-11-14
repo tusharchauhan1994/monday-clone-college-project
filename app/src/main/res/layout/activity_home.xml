@@ -31,8 +31,7 @@
             <ImageView
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:src="@android:drawable/ic_menu_gallery"
-                android:tint="#595DFF"
+                android:src="@drawable/app_logo"
                 android:layout_marginEnd="12dp"/>
 
             <TextView
@@ -346,7 +345,7 @@
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:src="@android:drawable/ic_menu_myplaces"
+                android:src="@drawable/ic_home"
                 android:tint="#595DFF"
                 android:layout_marginBottom="4dp"/>
 
