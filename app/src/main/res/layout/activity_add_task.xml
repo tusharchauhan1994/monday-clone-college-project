@@ -7,6 +7,7 @@
     android:orientation="vertical"
     android:background="#16181B"
     android:padding="24dp"
+    android:fitsSystemWindows="true"
     tools:context=".AddTaskActivity">
 
     <TextView

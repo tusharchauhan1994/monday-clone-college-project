@@ -6,6 +6,8 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp"
+    android:fitsSystemWindows="true"
+    android:background="#16181B"
     tools:context=".UpdateTaskActivity">
 
     <EditText
@@ -13,6 +15,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Item Name"
+        android:textColorHint="#999999"
+        android:textColor="@android:color/white"
         android:inputType="textCapSentences"
         android:textSize="24sp"
         android:textStyle="bold" />
@@ -21,18 +25,22 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
+        android:textColor="@android:color/white"
         android:text="Person" />
 
     <AutoCompleteTextView
         android:id="@+id/update_assignee"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textColorHint="#999999"
+        android:textColor="@android:color/white"
         android:hint="Assign to..." />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
+        android:textColor="@android:color/white"
         android:text="Status" />
 
     <Spinner
@@ -44,6 +52,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
+        android:textColor="@android:color/white"
         android:text="Priority" />
 
     <Spinner
@@ -55,6 +64,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
+        android:textColor="@android:color/white"
         android:text="Date" />
 
     <TextView
@@ -62,6 +72,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Select Date"
+        android:textColorHint="#999999"
+        android:textColor="@android:color/white"
         android:textSize="18sp"
         android:padding="8dp"
         android:background="?attr/editTextBackground"
