@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <color name="status_working_on_it">#FDAB3D</color>
+    <color name="status_stuck">#E2445C</color>
+    <color name="status_done">#00C875</color>
 </resources>

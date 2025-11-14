@@ -52,7 +52,7 @@ class UpdateTaskActivity : AppCompatActivity() {
         updateItemName.setText(item.name)
         updateDueDate.text = item.dueDate
 
-        val statusAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, StatusOptions.ALL_STATUSES)
+        val statusAdapter = StatusAdapter(this, StatusOptions.ALL_STATUSES.toTypedArray())
         updateStatus.adapter = statusAdapter
         val statusPosition = StatusOptions.ALL_STATUSES.indexOf(item.status)
         if (statusPosition != -1) {

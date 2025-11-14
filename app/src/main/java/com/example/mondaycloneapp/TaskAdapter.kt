@@ -1,10 +1,12 @@
 package com.example.mondaycloneapp
 
 import android.content.Intent
+import android.graphics.drawable.GradientDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mondaycloneapp.models.Item
 import com.example.mondaycloneapp.models.User
@@ -73,6 +75,16 @@ class TaskAdapter(private val listItems: List<ListItem>, private val listener: O
             taskPriority.text = task.priority
             taskStatus.text = task.status
             taskDueDate.text = task.dueDate
+
+            val statusColor = when (task.status) {
+                "Working on it" -> R.color.status_working_on_it
+                "Stuck" -> R.color.status_stuck
+                "Done" -> R.color.status_done
+                else -> R.color.status_working_on_it // Default color
+            }
+
+            val background = taskStatus.background as GradientDrawable
+            background.setColor(ContextCompat.getColor(itemView.context, statusColor))
 
             itemView.setOnClickListener {
                 val context = it.context
