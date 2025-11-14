@@ -147,57 +147,113 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:background="#16181B"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
+        android:background="#1F2126"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"
         android:elevation="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <Button style="@style/Widget.AppCompat.Button.Borderless"
+        <LinearLayout
             android:id="@+id/btn_nav_home"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Home"
-            android:textColor="#FFFFFF"
-            android:textSize="12sp"
-            android:drawableTop="@android:drawable/ic_menu_gallery"
-            android:drawableTint="#FFFFFF"/>
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="4dp"
+            android:background="?attr/selectableItemBackgroundBorderless">
 
-        <Button style="@style/Widget.AppCompat.Button.Borderless"
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@android:drawable/ic_menu_myplaces"
+                android:tint="#888888"
+                android:layout_marginBottom="4dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Home"
+                android:textColor="#888888"
+                android:textSize="12sp"/>
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/btn_nav_my_work"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="My work"
-            android:textColor="#FFFFFF"
-            android:textSize="12sp"
-            android:drawableTop="@android:drawable/ic_menu_agenda"
-            android:drawableTint="#FFFFFF"/>
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="4dp"
+            android:background="?attr/selectableItemBackgroundBorderless">
 
-        <Button style="@style/Widget.AppCompat.Button.Borderless"
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@android:drawable/ic_menu_agenda"
+                android:tint="#888888"
+                android:layout_marginBottom="4dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="My Work"
+                android:textColor="#888888"
+                android:textSize="12sp"/>
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/btn_nav_notifications"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Notifications"
-            android:textColor="#595DFF"
-            android:textSize="12sp"
-            android:drawableTop="@android:drawable/ic_popup_reminder"
-            android:drawableTint="#595DFF"/>
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="4dp"
+            android:background="?attr/selectableItemBackgroundBorderless">
 
-        <Button style="@style/Widget.AppCompat.Button.Borderless"
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@android:drawable/ic_popup_reminder"
+                android:tint="#595DFF"
+                android:layout_marginBottom="4dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Notifications"
+                android:textColor="#595DFF"
+                android:textSize="12sp"/>
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/btn_nav_more"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="More"
-            android:textColor="#FFFFFF"
-            android:textSize="12sp"
-            android:drawableTop="@android:drawable/ic_menu_more"
-            android:drawableTint="#FFFFFF"/>
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="4dp"
+            android:background="?attr/selectableItemBackgroundBorderless">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@android:drawable/ic_menu_more"
+                android:tint="#888888"
+                android:layout_marginBottom="4dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="More"
+                android:textColor="#888888"
+                android:textSize="12sp"/>
+        </LinearLayout>
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
