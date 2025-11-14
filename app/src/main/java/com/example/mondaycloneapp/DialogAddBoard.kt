@@ -77,7 +77,8 @@ class DialogAddBoard : DialogFragment() {
             id = boardId,
             name = boardName,
             ownerId = uid,
-            members = mapOf(uid to true)
+            members = mapOf(uid to true),
+            createdAt = System.currentTimeMillis()
         )
 
         val defaultGroup = Group(
