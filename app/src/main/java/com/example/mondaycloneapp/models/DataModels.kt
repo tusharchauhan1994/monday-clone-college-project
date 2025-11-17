@@ -1,6 +1,7 @@
 package com.example.mondaycloneapp.models
 
 import android.os.Parcelable
+import com.google.firebase.database.IgnoreExtraProperties
 import kotlinx.parcelize.Parcelize
 
 // --- CORE DATA MODELS FOR MONDAY CLONE ---
@@ -8,6 +9,7 @@ import kotlinx.parcelize.Parcelize
 /**
  * Represents a User profile.
  */
+@IgnoreExtraProperties
 @Parcelize
 data class User(
     val id: String = "",
@@ -18,6 +20,7 @@ data class User(
 /**
  * Represents a Board (Project/Workspace).
  */
+@IgnoreExtraProperties
 @Parcelize
 data class Board(
     val id: String = "",
@@ -30,6 +33,7 @@ data class Board(
 /**
  * Represents a Group within a Board.
  */
+@IgnoreExtraProperties
 @Parcelize
 data class Group(
     val id: String = "",
@@ -41,6 +45,7 @@ data class Group(
 /**
  * Represents an Item (Task) within a Group.
  */
+@IgnoreExtraProperties
 @Parcelize
 data class Item(
     val id: String = "",
@@ -55,20 +60,18 @@ data class Item(
 ) : Parcelable
 
 /**
- * Represents a Notification.
+ * Represents a Notification entry to be stored in the database.
  */
+@IgnoreExtraProperties
 @Parcelize
 data class Notification(
     val id: String = "",
-    val userId: String = "",           // Who should see this notification
-    val title: String = "",            // Short title like: "Task Updated"
-    val message: String = "",          // Full message
-    val type: String = "",             // task_update, comment, mention, due_date
-    val itemId: String? = null,        // Optional: which task
-    val boardId: String? = null,       // Optional: which board
-    val isRead: Boolean = false,       // For notification screen
-    val createdAt: Long = System.currentTimeMillis()
+    val userId: String = "",
+    val title: String = "",
+    val message: String = "",
+    val timestamp: Long = System.currentTimeMillis()
 ) : Parcelable
+
 
 // --- Utility: Status Options ---
 object StatusOptions {

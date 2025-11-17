@@ -1,17 +1,28 @@
 package com.example.mondaycloneapp
 
+import android.Manifest
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mondaycloneapp.models.Board
+import com.example.mondaycloneapp.models.Item
+import com.example.mondaycloneapp.models.Notification
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
@@ -19,20 +30,39 @@ import com.google.firebase.database.*
 class HomeActivity : AppCompatActivity() {
 
     private val db = FirebaseDatabase.getInstance().reference
-    private val auth = FirebaseAuth.getInstance()
+    private lateinit var auth: FirebaseAuth
+    private var authStateListener: FirebaseAuth.AuthStateListener? = null
+    private var tasksChildListener: ChildEventListener? = null
+    private val tasksRef = db.child("tasks")
+    private var isInitialDataLoaded = false
+
     private lateinit var fabAddTask: FloatingActionButton
     private lateinit var boardsRecyclerView: RecyclerView
     private lateinit var boardAdapter: BoardAdapter
 
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            Toast.makeText(this, "Notifications permission granted", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(this, "Notifications permission denied", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
+
+        auth = FirebaseAuth.getInstance()
 
         fabAddTask = findViewById(R.id.fab_add_task)
         boardsRecyclerView = findViewById(R.id.rv_boards)
         boardsRecyclerView.layoutManager = LinearLayoutManager(this)
 
         setupBottomNavigation()
+        setupAuthStateListener()
+        askNotificationPermission()
 
         fabAddTask.setOnClickListener {
             if (auth.currentUser != null) {
@@ -41,18 +71,133 @@ class HomeActivity : AppCompatActivity() {
                 Toast.makeText(this, "Please log in to access features.", Toast.LENGTH_SHORT).show()
             }
         }
+    }
 
-        loadBoards()
+    override fun onStart() {
+        super.onStart()
+        authStateListener?.let { auth.addAuthStateListener(it) }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        authStateListener?.let { auth.removeAuthStateListener(it) }
+        tasksChildListener?.let { tasksRef.removeEventListener(it) } // Clean up the listener
+    }
+
+    private fun setupAuthStateListener() {
+        authStateListener = FirebaseAuth.AuthStateListener { firebaseAuth ->
+            val user = firebaseAuth.currentUser
+            if (user != null) {
+                Log.d("NotificationDebug", "Auth state confirmed. User ID: ${user.uid}")
+                loadBoards(user.uid)
+                listenForTaskAssignments(user.uid)
+            } else {
+                Log.d("NotificationDebug", "User is signed out.")
+            }
+        }
+    }
+
+    private fun askNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
     }
 
     fun refreshData() {
-        Toast.makeText(this, "Board list refreshed!", Toast.LENGTH_SHORT).show()
-        loadBoards()
+        val uid = auth.currentUser?.uid
+        if (uid != null) {
+            loadBoards(uid)
+            Toast.makeText(this, "Board list refreshed!", Toast.LENGTH_SHORT).show()
+        }
     }
 
-    private fun loadBoards() {
-        val userId = auth.currentUser?.uid ?: return
+    private fun listenForTaskAssignments(userId: String) {
+        tasksChildListener?.let { tasksRef.removeEventListener(it) }
+        isInitialDataLoaded = false
 
+        tasksRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                isInitialDataLoaded = true
+                Log.d("NotificationDebug", "Initial data load complete. Ready for new assignments.")
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("NotificationDebug", "Initial data load failed.", error.toException())
+            }
+        })
+
+        tasksChildListener = tasksRef.addChildEventListener(object : ChildEventListener {
+            private fun checkAssignment(snapshot: DataSnapshot, eventType: String) {
+                val task = snapshot.getValue(Item::class.java)
+                if (task == null) {
+                    Log.w("NotificationDebug", "$eventType: Received task data is null for key ${snapshot.key}")
+                    return
+                }
+
+                val assigneeId = task.assignee
+                Log.d("NotificationDebug", "$eventType: Task '${task.name}' has assignee: $assigneeId")
+
+                if (assigneeId == userId) {
+                    Log.i("NotificationDebug", "SUCCESS: Match found! Showing notification for task '${task.name}'.")
+                    val title = "Task Assigned to You"
+                    val message = "You have been assigned the task: ${task.name}"
+                    showNotification(title, message)
+                    saveNotificationToDatabase(userId, title, message)
+                } else {
+                    Log.d("NotificationDebug", "No match. Current user is '$userId' but assignee is '$assigneeId'.")
+                }
+            }
+
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                if (!isInitialDataLoaded) return // Ignore the initial data dump at startup
+                checkAssignment(snapshot, "onChildAdded (NEW TASK)")
+            }
+
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+                 if (!isInitialDataLoaded) return
+                checkAssignment(snapshot, "onChildChanged (UPDATED TASK)")
+            }
+
+            override fun onChildRemoved(snapshot: DataSnapshot) {}
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("NotificationDebug", "Failed to listen for task assignments.", error.toException())
+            }
+        })
+    }
+
+    private fun saveNotificationToDatabase(userId: String, title: String, message: String) {
+        val notificationsRef = db.child("notifications").child(userId)
+        val notificationId = notificationsRef.push().key ?: return
+        val notification = Notification(notificationId, userId, title, message)
+        notificationsRef.child(notificationId).setValue(notification)
+    }
+
+    private fun showNotification(title: String, message: String) {
+        val channelId = "task_assignment_channel"
+        val notificationBuilder = NotificationCompat.Builder(this, channelId)
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setContentTitle(title)
+            .setContentText(message)
+            .setAutoCancel(true)
+
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                channelId,
+                "Task Assignments",
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
+            notificationManager.createNotificationChannel(channel)
+        }
+
+        notificationManager.notify(System.currentTimeMillis().toInt(), notificationBuilder.build())
+    }
+
+    private fun loadBoards(userId: String) {
         db.child("boards").orderByChild("members/$userId").equalTo(true)
             .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
@@ -127,13 +272,11 @@ class HomeActivity : AppCompatActivity() {
 
     private fun deleteBoard(board: Board) {
         val boardId = board.id
-        // Delete all tasks associated with the board
         db.child("tasks").orderByChild("boardId").equalTo(boardId).addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 for (taskSnapshot in snapshot.children) {
                     taskSnapshot.ref.removeValue()
                 }
-                // Delete the board itself
                 db.child("boards").child(boardId).removeValue()
             }
 

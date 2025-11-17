@@ -23,6 +23,7 @@ import com.google.android.material.button.MaterialButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.messaging.FirebaseMessaging
 
 class LoginStartActivity : AppCompatActivity() {
 
@@ -127,6 +128,7 @@ class LoginStartActivity : AppCompatActivity() {
 
                     val database = FirebaseDatabase.getInstance().getReference("users")
                     database.child(firebaseUser.uid).setValue(user).addOnCompleteListener { 
+                        saveUserFcmToken()
                         Toast.makeText(this, "Google Login successful!", Toast.LENGTH_SHORT).show()
                         val intent = Intent(this, HomeActivity::class.java)
                         startActivity(intent)
@@ -143,6 +145,7 @@ class LoginStartActivity : AppCompatActivity() {
             .addOnCompleteListener(this) { task ->
                 hideLoading()
                 if (task.isSuccessful) {
+                    saveUserFcmToken()
                     Toast.makeText(this, "Login successful!", Toast.LENGTH_SHORT).show()
                     val intent = Intent(this, HomeActivity::class.java)
                     startActivity(intent)
@@ -151,5 +154,22 @@ class LoginStartActivity : AppCompatActivity() {
                     Toast.makeText(this, "Authentication failed. ${task.exception?.message}", Toast.LENGTH_LONG).show()
                 }
             }
+    }
+
+    private fun saveUserFcmToken() {
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.w("FCM", "Fetching FCM registration token failed", task.exception)
+                return@addOnCompleteListener
+            }
+
+            // Get new FCM registration token
+            val token = task.result
+            val userId = auth.currentUser?.uid ?: return@addOnCompleteListener
+
+            // Save token to Realtime Database
+            val database = FirebaseDatabase.getInstance().getReference("users")
+            database.child(userId).child("fcmToken").setValue(token)
+        }
     }
 }
