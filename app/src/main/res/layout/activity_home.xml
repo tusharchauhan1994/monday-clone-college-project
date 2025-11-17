@@ -48,7 +48,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:src="@android:drawable/ic_menu_search"
-            android:tint="#FFFFFF"
+            app:tint="#FFFFFF"
             android:padding="8dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:layout_marginEnd="8dp"/>
@@ -57,7 +57,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:src="@android:drawable/ic_menu_add"
-            android:tint="#FFFFFF"
+            app:tint="#FFFFFF"
             android:padding="8dp"
             android:background="?attr/selectableItemBackgroundBorderless"/>
     </LinearLayout>
@@ -112,7 +112,7 @@
                             android:layout_width="40dp"
                             android:layout_height="40dp"
                             android:src="@android:drawable/ic_menu_directions"
-                            android:tint="@android:color/white"
+                            app:tint="@android:color/white"
                             android:background="?attr/selectableItemBackgroundBorderless"
                             android:padding="8dp"
                             android:rotation="180"/>
@@ -238,7 +238,7 @@
                             android:layout_width="40dp"
                             android:layout_height="40dp"
                             android:src="@android:drawable/ic_menu_directions"
-                            android:tint="@android:color/white"
+                            app:tint="@android:color/white"
                             android:background="?attr/selectableItemBackgroundBorderless"
                             android:padding="8dp"
                             android:rotation="180"/>
@@ -248,7 +248,7 @@
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/rv_boards"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="240dp"
                         tools:listitem="@layout/list_item_board"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
@@ -278,7 +278,7 @@
                             android:layout_width="32dp"
                             android:layout_height="32dp"
                             android:src="@android:drawable/ic_menu_view"
-                            android:tint="#595DFF"
+                            app:tint="#595DFF"
                             android:layout_marginEnd="12dp"/>
 
                         <TextView
@@ -294,7 +294,7 @@
                             android:layout_width="40dp"
                             android:layout_height="40dp"
                             android:src="@android:drawable/ic_menu_directions"
-                            android:tint="@android:color/white"
+                            app:tint="@android:color/white"
                             android:background="?attr/selectableItemBackgroundBorderless"
                             android:padding="8dp"
                             android:rotation="180"/>
@@ -311,7 +311,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="24dp"
         android:src="@android:drawable/ic_input_add"
-        android:tint="@android:color/white"
+        app:tint="@android:color/white"
         app:backgroundTint="#595DFF"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/bottom_navigation"
@@ -346,7 +346,7 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/ic_home"
-                android:tint="#595DFF"
+                app:tint="#595DFF"
                 android:layout_marginBottom="4dp"/>
 
             <TextView
@@ -371,7 +371,7 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@android:drawable/ic_menu_agenda"
-                android:tint="#888888"
+                app:tint="#888888"
                 android:layout_marginBottom="4dp"/>
 
             <TextView
@@ -396,7 +396,7 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@android:drawable/ic_popup_reminder"
-                android:tint="#888888"
+                app:tint="#888888"
                 android:layout_marginBottom="4dp"/>
 
             <TextView
@@ -421,7 +421,7 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@android:drawable/ic_menu_more"
-                android:tint="#888888"
+                app:tint="#888888"
                 android:layout_marginBottom="4dp"/>
 
             <TextView
