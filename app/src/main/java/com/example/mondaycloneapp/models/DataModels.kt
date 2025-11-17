@@ -54,6 +54,22 @@ data class Item(
     val createdAt: Long = System.currentTimeMillis()
 ) : Parcelable
 
+/**
+ * Represents a Notification.
+ */
+@Parcelize
+data class Notification(
+    val id: String = "",
+    val userId: String = "",           // Who should see this notification
+    val title: String = "",            // Short title like: "Task Updated"
+    val message: String = "",          // Full message
+    val type: String = "",             // task_update, comment, mention, due_date
+    val itemId: String? = null,        // Optional: which task
+    val boardId: String? = null,       // Optional: which board
+    val isRead: Boolean = false,       // For notification screen
+    val createdAt: Long = System.currentTimeMillis()
+) : Parcelable
+
 // --- Utility: Status Options ---
 object StatusOptions {
     const val WORKING_ON_IT = "Working on it"

@@ -1,7 +1,6 @@
 package com.example.mondaycloneapp
 
 import android.app.DatePickerDialog
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
@@ -10,10 +9,14 @@ import android.widget.EditText
 import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import com.example.mondaycloneapp.models.Board
 import com.example.mondaycloneapp.models.Item
+import com.example.mondaycloneapp.models.Notification
 import com.example.mondaycloneapp.models.PriorityOptions
 import com.example.mondaycloneapp.models.StatusOptions
 import com.example.mondaycloneapp.models.User
+import com.example.mondaycloneapp.utils.NotificationManager
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -129,6 +132,7 @@ class UpdateTaskActivity : AppCompatActivity() {
     private fun updateItemInDatabase() {
         val assignedUserEmail = updateAssignee.text.toString()
         val assignedUser = users.find { it.email == assignedUserEmail }
+        val originalAssigneeId = item.assignee
 
         val updatedItem = item.copy(
             name = updateItemName.text.toString(),
@@ -142,11 +146,60 @@ class UpdateTaskActivity : AppCompatActivity() {
             .child(item.id)
             .setValue(updatedItem)
             .addOnSuccessListener {
-                if (assignedUser != null) {
-                    addMemberToBoard(assignedUser.id)
-                }
                 Toast.makeText(this, "Item updated successfully", Toast.LENGTH_SHORT).show()
-                finish()
+
+                // Fetch board to get its name for notifications
+                val boardRef = FirebaseDatabase.getInstance().getReference("boards").child(updatedItem.boardId)
+                boardRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        val board = snapshot.getValue(Board::class.java)
+
+                        if (board == null) {
+                            finish()
+                            return
+                        }
+
+                        // Notify assignee
+                        if (assignedUser != null) {
+                            addMemberToBoard(assignedUser.id)
+
+                            val (notificationTitle, notificationMessage) = if (assignedUser.id != originalAssigneeId) {
+                                "You were assigned a new task" to "You have been assigned to '${updatedItem.name}' on board '${board.name}'."
+                            } else {
+                                "Task Updated" to "The task '${updatedItem.name}' on board '${board.name}' has been updated."
+                            }
+
+                            val assigneeNotification = Notification(
+                                userId = assignedUser.id,
+                                title = notificationTitle,
+                                message = notificationMessage,
+                                type = if (assignedUser.id != originalAssigneeId) "task_assignment" else "task_update",
+                                itemId = updatedItem.id,
+                                boardId = updatedItem.boardId
+                            )
+                            NotificationManager.createNotification(assigneeNotification)
+                        }
+
+                        // Notify board owner
+                        if (board.ownerId.isNotEmpty() && board.ownerId != assignedUser?.id) {
+                            val ownerNotification = Notification(
+                                userId = board.ownerId,
+                                title = "Task Updated on Your Board",
+                                message = "The task '${updatedItem.name}' on board '${board.name}' was updated.",
+                                type = "task_update",
+                                itemId = updatedItem.id,
+                                boardId = updatedItem.boardId
+                            )
+                            NotificationManager.createNotification(ownerNotification)
+                        }
+
+                        finish() // Finish after all notifications are sent
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        finish() // Still finish even if notifications fail
+                    }
+                })
             }
             .addOnFailureListener {
                 Toast.makeText(this, "Failed to update item", Toast.LENGTH_SHORT).show()
