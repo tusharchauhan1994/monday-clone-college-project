@@ -69,8 +69,17 @@ data class Notification(
     val userId: String = "",
     val title: String = "",
     val message: String = "",
-    val timestamp: Long = System.currentTimeMillis()
+    val timestamp: Long = System.currentTimeMillis(),
+    val type: String = "task_update" // e.g., task_assignment, status_change, due_date_update
 ) : Parcelable
+
+object NotificationType {
+    const val TASK_ASSIGNMENT = "task_assignment"
+    const val STATUS_CHANGE = "status_change"
+    const val DUE_DATE_UPDATE = "due_date_update"
+    const val PRIORITY_CHANGE = "priority_change"
+    const val TASK_COMPLETED = "task_completed"
+}
 
 
 // --- Utility: Status Options ---

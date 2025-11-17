@@ -10,10 +10,7 @@ import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.example.mondaycloneapp.models.Item
-import com.example.mondaycloneapp.models.PriorityOptions
-import com.example.mondaycloneapp.models.StatusOptions
-import com.example.mondaycloneapp.models.User
+import com.example.mondaycloneapp.models.*
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -24,7 +21,7 @@ import java.util.Locale
 
 class UpdateTaskActivity : AppCompatActivity() {
 
-    private lateinit var item: Item
+    private lateinit var originalItem: Item
 
     private lateinit var updateItemName: EditText
     private lateinit var updateAssignee: AutoCompleteTextView
@@ -36,12 +33,13 @@ class UpdateTaskActivity : AppCompatActivity() {
 
     private val users = mutableListOf<User>()
     private val userEmails = mutableListOf<String>()
+    private val db = FirebaseDatabase.getInstance().reference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_update_task)
 
-        item = intent.getParcelableExtra<Item>("item")!!
+        originalItem = intent.getParcelableExtra<Item>("item")!!
 
         updateItemName = findViewById(R.id.update_item_name)
         updateAssignee = findViewById(R.id.update_assignee)
@@ -51,60 +49,40 @@ class UpdateTaskActivity : AppCompatActivity() {
         saveItemButton = findViewById(R.id.save_item_button)
         deleteItemButton = findViewById(R.id.delete_item_button)
 
-        updateItemName.setText(item.name)
-        updateDueDate.text = item.dueDate
+        updateItemName.setText(originalItem.name)
+        updateDueDate.text = originalItem.dueDate
 
         val statusAdapter = StatusAdapter(this, StatusOptions.ALL_STATUSES.toTypedArray())
         updateStatus.adapter = statusAdapter
-        val statusPosition = StatusOptions.ALL_STATUSES.indexOf(item.status)
-        if (statusPosition != -1) {
-            updateStatus.setSelection(statusPosition)
-        }
+        updateStatus.setSelection(StatusOptions.ALL_STATUSES.indexOf(originalItem.status))
 
         val priorityAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, PriorityOptions.ALL_PRIORITIES)
         updatePriority.adapter = priorityAdapter
-        val priorityPosition = PriorityOptions.ALL_PRIORITIES.indexOf(item.priority)
-        if (priorityPosition != -1) {
-            updatePriority.setSelection(priorityPosition)
-        }
+        updatePriority.setSelection(PriorityOptions.ALL_PRIORITIES.indexOf(originalItem.priority))
 
         fetchUsers()
 
-        updateDueDate.setOnClickListener {
-            showDatePickerDialog()
-        }
-
-        saveItemButton.setOnClickListener {
-            updateItemInDatabase()
-        }
-
-        deleteItemButton.setOnClickListener {
-            deleteItem()
-        }
+        updateDueDate.setOnClickListener { showDatePickerDialog() }
+        saveItemButton.setOnClickListener { updateAndNotify() }
+        deleteItemButton.setOnClickListener { deleteItem() }
     }
 
     private fun fetchUsers() {
-        val usersRef = FirebaseDatabase.getInstance().getReference("users")
-        usersRef.addListenerForSingleValueEvent(object : ValueEventListener {
+        db.child("users").addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 users.clear()
                 userEmails.clear()
                 for (userSnapshot in snapshot.children) {
-                    val user = userSnapshot.getValue(User::class.java)
-                    if (user != null) {
-                        val userWithId = user.copy(id = userSnapshot.key!!)
-                        users.add(userWithId)
-                        userEmails.add(userWithId.email)
+                    val user = userSnapshot.getValue(User::class.java)?.copy(id = userSnapshot.key!!)
+                    user?.let { 
+                        users.add(it)
+                        userEmails.add(it.email)
                     }
                 }
                 val adapter = ArrayAdapter(this@UpdateTaskActivity, android.R.layout.simple_dropdown_item_1line, userEmails)
                 updateAssignee.setAdapter(adapter)
-
-                item.assignee?.let { assigneeId ->
-                    val assignedUser = users.find { it.id == assigneeId }
-                    assignedUser?.let {
-                        updateAssignee.setText(it.email, false)
-                    }
+                originalItem.assignee?.let { assigneeId ->
+                    users.find { it.id == assigneeId }?.let { updateAssignee.setText(it.email, false) }
                 }
             }
 
@@ -114,27 +92,11 @@ class UpdateTaskActivity : AppCompatActivity() {
         })
     }
 
-    private fun showDatePickerDialog() {
-        val calendar = Calendar.getInstance()
-        val year = calendar.get(Calendar.YEAR)
-        val month = calendar.get(Calendar.MONTH)
-        val day = calendar.get(Calendar.DAY_OF_MONTH)
-
-        val datePickerDialog = DatePickerDialog(this, {
-            _, selectedYear, selectedMonth, selectedDay ->
-            val selectedCalendar = Calendar.getInstance()
-            selectedCalendar.set(selectedYear, selectedMonth, selectedDay)
-            val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-            updateDueDate.text = dateFormat.format(selectedCalendar.time)
-        }, year, month, day)
-        datePickerDialog.show()
-    }
-
-    private fun updateItemInDatabase() {
+    private fun updateAndNotify() {
         val assignedUserEmail = updateAssignee.text.toString()
         val assignedUser = users.find { it.email == assignedUserEmail }
 
-        val updatedItem = item.copy(
+        val updatedItem = originalItem.copy(
             name = updateItemName.text.toString(),
             status = updateStatus.selectedItem.toString(),
             priority = updatePriority.selectedItem.toString(),
@@ -142,38 +104,78 @@ class UpdateTaskActivity : AppCompatActivity() {
             dueDate = updateDueDate.text.toString()
         )
 
-        FirebaseDatabase.getInstance().getReference("tasks")
-            .child(item.id)
-            .setValue(updatedItem)
-            .addOnSuccessListener {
-                Toast.makeText(this, "Item updated successfully", Toast.LENGTH_SHORT).show()
+        // Save the updated item
+        db.child("tasks").child(originalItem.id).setValue(updatedItem).addOnSuccessListener {
+            Toast.makeText(this, "Item updated successfully", Toast.LENGTH_SHORT).show()
+            
+            // --- Generate Notifications based on what changed ---
+            generateNotifications(originalItem, updatedItem)
 
-                if (assignedUser != null) {
-                    addMemberToBoard(assignedUser.id)
-                }
+            // Add user to board if newly assigned
+            if (assignedUser != null && originalItem.assignee != updatedItem.assignee) {
+                addMemberToBoard(assignedUser.id, updatedItem.boardId)
+            }
 
-                finish()
-            }
-            .addOnFailureListener {
-                Toast.makeText(this, "Failed to update item", Toast.LENGTH_SHORT).show()
-            }
+            finish()
+        }.addOnFailureListener {
+            Toast.makeText(this, "Failed to update item", Toast.LENGTH_SHORT).show()
+        }
     }
 
-    private fun addMemberToBoard(userId: String) {
-        val boardRef = FirebaseDatabase.getInstance().getReference("boards").child(item.boardId)
-        boardRef.child("members").child(userId).setValue(true)
+    private fun generateNotifications(original: Item, updated: Item) {
+        val assigneeId = updated.assignee ?: return
+
+        // 1. Assignment Change
+        if (original.assignee != updated.assignee) {
+            createNotification(assigneeId, NotificationType.TASK_ASSIGNMENT, "You've been assigned a new task", "Task: ${updated.name}")
+        }
+
+        // 2. Status Change
+        if (original.status != updated.status) {
+            if (updated.status == StatusOptions.DONE) {
+                 createNotification(assigneeId, NotificationType.TASK_COMPLETED, "Task Completed!", "You've completed the task: ${updated.name}")
+            } else {
+                 createNotification(assigneeId, NotificationType.STATUS_CHANGE, "Task Status Updated", "Status for '${updated.name}' changed from ${original.status} to ${updated.status}")
+            }
+        }
+
+        // 3. Due Date Change
+        if (original.dueDate != updated.dueDate) {
+            createNotification(assigneeId, NotificationType.DUE_DATE_UPDATE, "Due Date Changed", "The due date for '${updated.name}' has been changed to ${updated.dueDate}")
+        }
+
+        // 4. Priority Change
+        if (original.priority != updated.priority && updated.priority == PriorityOptions.HIGH) {
+             createNotification(assigneeId, NotificationType.PRIORITY_CHANGE, "Priority Set to HIGH", "The priority for task '${updated.name}' is now HIGH.")
+        }
+    }
+
+    private fun createNotification(userId: String, type: String, title: String, message: String) {
+        val notificationsRef = db.child("notifications").child(userId)
+        val notificationId = notificationsRef.push().key ?: return
+        val notification = Notification(notificationId, userId, title, message, System.currentTimeMillis(), type)
+        notificationsRef.child(notificationId).setValue(notification)
+    }
+
+    private fun addMemberToBoard(userId: String, boardId: String) {
+        db.child("boards").child(boardId).child("members").child(userId).setValue(true)
+    }
+
+    private fun showDatePickerDialog() {
+        val calendar = Calendar.getInstance()
+        val (year, month, day) = listOf(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH))
+        DatePickerDialog(this, { _, y, m, d ->
+            val cal = Calendar.getInstance().apply { set(y, m, d) }
+            updateDueDate.text = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(cal.time)
+        }, year, month, day).show()
     }
 
     private fun deleteItem() {
-        FirebaseDatabase.getInstance().getReference("tasks")
-            .child(item.id)
-            .removeValue()
-            .addOnSuccessListener {
-                Toast.makeText(this, "Item deleted successfully", Toast.LENGTH_SHORT).show()
-                finish()
-            }
-            .addOnFailureListener {
-                Toast.makeText(this, "Failed to delete item", Toast.LENGTH_SHORT).show()
-            }
+        db.child("tasks").child(originalItem.id).removeValue().addOnSuccessListener {
+            Toast.makeText(this, "Item deleted successfully", Toast.LENGTH_SHORT).show()
+            finish()
+        }.addOnFailureListener {
+            Toast.makeText(this, "Failed to delete item", Toast.LENGTH_SHORT).show()
+        }
     }
 }

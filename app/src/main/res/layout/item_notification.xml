@@ -6,11 +6,21 @@
     android:background="#1F2126"
     android:layout_marginBottom="8dp">
 
+    <ImageView
+        android:id="@+id/notification_icon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="16dp"
+        android:src="@android:drawable/ic_menu_info_details" 
+        android:tint="@android:color/white"/>
+
     <TextView
         android:id="@+id/notification_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
+        android:layout_toEndOf="@id/notification_icon"
         android:textColor="@android:color/white"
         android:textSize="16sp"
         android:textStyle="bold" />
@@ -28,7 +38,8 @@
         android:id="@+id/notification_message"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/notification_title"
+        android:layout_toEndOf="@id/notification_icon"
+        android:layout_below="@id/notification_title"
         android:textColor="@android:color/darker_gray"
         android:textSize="14sp"
         android:layout_marginTop="4dp"/>

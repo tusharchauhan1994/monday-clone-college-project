@@ -22,7 +22,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mondaycloneapp.models.Board
 import com.example.mondaycloneapp.models.Item
-import com.example.mondaycloneapp.models.Notification
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
@@ -141,10 +140,7 @@ class HomeActivity : AppCompatActivity() {
 
                 if (assigneeId == userId) {
                     Log.i("NotificationDebug", "SUCCESS: Match found! Showing notification for task '${task.name}'.")
-                    val title = "Task Assigned to You"
-                    val message = "You have been assigned the task: ${task.name}"
-                    showNotification(title, message)
-                    saveNotificationToDatabase(userId, title, message)
+                    showNotification("Task Assigned to You", "You have been assigned the task: ${task.name}")
                 } else {
                     Log.d("NotificationDebug", "No match. Current user is '$userId' but assignee is '$assigneeId'.")
                 }
@@ -166,13 +162,6 @@ class HomeActivity : AppCompatActivity() {
                 Log.e("NotificationDebug", "Failed to listen for task assignments.", error.toException())
             }
         })
-    }
-
-    private fun saveNotificationToDatabase(userId: String, title: String, message: String) {
-        val notificationsRef = db.child("notifications").child(userId)
-        val notificationId = notificationsRef.push().key ?: return
-        val notification = Notification(notificationId, userId, title, message)
-        notificationsRef.child(notificationId).setValue(notification)
     }
 
     private fun showNotification(title: String, message: String) {
