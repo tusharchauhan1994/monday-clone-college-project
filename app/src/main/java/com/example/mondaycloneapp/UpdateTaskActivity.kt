@@ -21,7 +21,9 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Locale
 
 class UpdateTaskActivity : AppCompatActivity() {
 
@@ -123,8 +125,10 @@ class UpdateTaskActivity : AppCompatActivity() {
 
         val datePickerDialog = DatePickerDialog(this, {
             _, selectedYear, selectedMonth, selectedDay ->
-            val selectedDate = "$selectedYear-${selectedMonth + 1}-$selectedDay"
-            updateDueDate.text = selectedDate
+            val selectedCalendar = Calendar.getInstance()
+            selectedCalendar.set(selectedYear, selectedMonth, selectedDay)
+            val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+            updateDueDate.text = dateFormat.format(selectedCalendar.time)
         }, year, month, day)
         datePickerDialog.show()
     }
@@ -148,7 +152,6 @@ class UpdateTaskActivity : AppCompatActivity() {
             .addOnSuccessListener {
                 Toast.makeText(this, "Item updated successfully", Toast.LENGTH_SHORT).show()
 
-                // Fetch board to get its name for notifications
                 val boardRef = FirebaseDatabase.getInstance().getReference("boards").child(updatedItem.boardId)
                 boardRef.addListenerForSingleValueEvent(object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
@@ -159,7 +162,6 @@ class UpdateTaskActivity : AppCompatActivity() {
                             return
                         }
 
-                        // Notify assignee
                         if (assignedUser != null) {
                             addMemberToBoard(assignedUser.id)
 
@@ -180,7 +182,6 @@ class UpdateTaskActivity : AppCompatActivity() {
                             NotificationManager.createNotification(assigneeNotification)
                         }
 
-                        // Notify board owner
                         if (board.ownerId.isNotEmpty() && board.ownerId != assignedUser?.id) {
                             val ownerNotification = Notification(
                                 userId = board.ownerId,
@@ -193,11 +194,11 @@ class UpdateTaskActivity : AppCompatActivity() {
                             NotificationManager.createNotification(ownerNotification)
                         }
 
-                        finish() // Finish after all notifications are sent
+                        finish()
                     }
 
                     override fun onCancelled(error: DatabaseError) {
-                        finish() // Still finish even if notifications fail
+                        finish()
                     }
                 })
             }

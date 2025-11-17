@@ -11,6 +11,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.mondaycloneapp.models.Item
 import com.example.mondaycloneapp.models.User
 import com.google.firebase.database.FirebaseDatabase
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 private const val TYPE_HEADER = 0
 private const val TYPE_ITEM = 1
@@ -74,7 +76,19 @@ class TaskAdapter(private val listItems: List<ListItem>, private val listener: O
             taskName.text = task.name
             taskPriority.text = task.priority
             taskStatus.text = task.status
-            taskDueDate.text = task.dueDate
+
+            if (task.dueDate != null) {
+                try {
+                    val inputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                    val outputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                    val date = inputFormat.parse(task.dueDate!!)
+                    taskDueDate.text = outputFormat.format(date!!)
+                } catch (e: Exception) {
+                    taskDueDate.text = task.dueDate // Fallback to original string
+                }
+            } else {
+                taskDueDate.text = ""
+            }
 
             val statusColor = when (task.status) {
                 "Working on it" -> R.color.status_working_on_it

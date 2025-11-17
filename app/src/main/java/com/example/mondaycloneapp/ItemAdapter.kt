@@ -7,6 +7,8 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mondaycloneapp.models.Item
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class ItemAdapter(
     private var items: List<Item>,
@@ -22,6 +24,7 @@ class ItemAdapter(
     inner class ItemViewHolder(view: View) : RecyclerView.ViewHolder(view), View.OnClickListener, View.OnLongClickListener {
         val itemName: TextView = view.findViewById(R.id.tv_item_name)
         val itemStatus: TextView = view.findViewById(R.id.tv_item_status)
+        val itemDueDate: TextView = view.findViewById(R.id.tv_due_date)
 
         init {
             itemView.setOnClickListener(this)
@@ -61,6 +64,13 @@ class ItemAdapter(
         val item = items[position]
         holder.itemName.text = item.name
         holder.itemStatus.text = "Status: ${item.status}"
+
+        if (item.dueDate != null) {
+            holder.itemDueDate.text = "Due Date: ${item.dueDate}"
+            holder.itemDueDate.visibility = View.VISIBLE
+        } else {
+            holder.itemDueDate.visibility = View.GONE
+        }
     }
 
     // This tells the RecyclerView how many items are in the list.

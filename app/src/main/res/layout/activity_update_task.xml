@@ -65,13 +65,13 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:textColor="@android:color/white"
-        android:text="Date" />
+        android:text="Due Date" />
 
     <TextView
         android:id="@+id/update_due_date"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Select Date"
+        android:hint="DD/MM/YYYY"
         android:textColorHint="#999999"
         android:textColor="@android:color/white"
         android:textSize="18sp"
