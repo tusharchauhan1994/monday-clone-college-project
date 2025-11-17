@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mondaycloneapp.models.Item
 import com.example.mondaycloneapp.models.User
@@ -22,10 +23,17 @@ sealed class ListItem {
     data class TaskItem(val task: Item) : ListItem()
 }
 
-class TaskAdapter(private val listItems: List<ListItem>, private val listener: OnItemClickListener) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class TaskAdapter(private var listItems: List<ListItem>, private val listener: OnItemClickListener) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     interface OnItemClickListener {
         fun onItemLongClick(item: Item)
+    }
+
+    fun updateTasks(newListItems: List<ListItem>) {
+        val diffCallback = TaskDiffCallback(listItems, newListItems)
+        val diffResult = DiffUtil.calculateDiff(diffCallback)
+        listItems = newListItems
+        diffResult.dispatchUpdatesTo(this)
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -121,5 +129,32 @@ class TaskAdapter(private val listItems: List<ListItem>, private val listener: O
                 taskAssignee.text = "Unassigned"
             }
         }
+    }
+}
+
+class TaskDiffCallback(
+    private val oldList: List<ListItem>,
+    private val newList: List<ListItem>
+) : DiffUtil.Callback() {
+
+    override fun getOldListSize(): Int = oldList.size
+    override fun getNewListSize(): Int = newList.size
+
+    override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+        val oldItem = oldList[oldItemPosition]
+        val newItem = newList[newItemPosition]
+        return if (oldItem is ListItem.TaskItem && newItem is ListItem.TaskItem) {
+            oldItem.task.id == newItem.task.id
+        } else if (oldItem is ListItem.GroupHeader && newItem is ListItem.GroupHeader) {
+            oldItem.title == newItem.title
+        } else {
+            false
+        }
+    }
+
+    override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+        val oldItem = oldList[oldItemPosition]
+        val newItem = newList[newItemPosition]
+        return oldItem == newItem
     }
 }

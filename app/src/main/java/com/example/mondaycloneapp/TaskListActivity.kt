@@ -39,6 +39,8 @@ class TaskListActivity : AppCompatActivity(), TaskAdapter.OnItemClickListener {
 
         tasksRecyclerView = findViewById(R.id.rv_tasks)
         tasksRecyclerView.layoutManager = LinearLayoutManager(this)
+        taskAdapter = TaskAdapter(emptyList(), this)
+        tasksRecyclerView.adapter = taskAdapter
 
         fabAddTask = findViewById(R.id.fab_add_task)
 
@@ -92,8 +94,7 @@ class TaskListActivity : AppCompatActivity(), TaskAdapter.OnItemClickListener {
             }
         }
 
-        taskAdapter = TaskAdapter(listItems, this)
-        tasksRecyclerView.adapter = taskAdapter
+        taskAdapter.updateTasks(listItems)
     }
 
     override fun onItemLongClick(item: Item) {

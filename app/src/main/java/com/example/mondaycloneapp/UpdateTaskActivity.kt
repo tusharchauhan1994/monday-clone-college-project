@@ -105,7 +105,7 @@ class UpdateTaskActivity : AppCompatActivity() {
         )
 
         // Save the updated item
-        db.child("tasks").child(originalItem.id).setValue(updatedItem).addOnSuccessListener {
+        db.child("items").child(originalItem.id).setValue(updatedItem).addOnSuccessListener {
             Toast.makeText(this, "Item updated successfully", Toast.LENGTH_SHORT).show()
             
             // --- Generate Notifications based on what changed ---
@@ -171,7 +171,7 @@ class UpdateTaskActivity : AppCompatActivity() {
     }
 
     private fun deleteItem() {
-        db.child("tasks").child(originalItem.id).removeValue().addOnSuccessListener {
+        db.child("items").child(originalItem.id).removeValue().addOnSuccessListener {
             Toast.makeText(this, "Item deleted successfully", Toast.LENGTH_SHORT).show()
             finish()
         }.addOnFailureListener {
