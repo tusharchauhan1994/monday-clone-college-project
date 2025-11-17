@@ -2,21 +2,43 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="16dp"
+    android:padding="20dp"
     android:background="@drawable/rounded_outline_btn">
 
+    <!-- Title / Input -->
     <EditText
         android:id="@+id/et_board_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Enter board name"
+        android:textColor="#FFFFFF"
+        android:textColorHint="#B5B5B5"
+        android:textSize="17sp"
+        android:paddingVertical="14dp"
+        android:paddingHorizontal="8dp"
+        android:background="@android:color/transparent"
         android:inputType="textCapWords" />
 
+    <!-- Divider Line -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#3D3D3D"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="20dp"/>
+
+    <!-- Create Board Button -->
     <Button
         android:id="@+id/btn_create_board"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Create Board" />
+        android:layout_height="48dp"
+        android:text="Create Board"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#595DFF"
+        android:layout_marginTop="4dp"
+        android:elevation="4dp"
+        android:translationZ="4dp" />
 
 </LinearLayout>
