@@ -3,12 +3,15 @@ package com.example.mondaycloneapp
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ScrollView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import com.airbnb.lottie.LottieAnimationView
 import com.example.mondaycloneapp.models.User
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -23,6 +26,8 @@ class CreateAccountActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
     private lateinit var googleSignInClient: GoogleSignInClient
+    private lateinit var loadingAnimation: LottieAnimationView
+    private lateinit var contentScrollView: ScrollView
 
     private val googleSignInLauncher: ActivityResultLauncher<Intent> =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -34,7 +39,10 @@ class CreateAccountActivity : AppCompatActivity() {
                 } catch (e: ApiException) {
                     Log.w("GoogleSignIn", "Google sign in failed", e)
                     Toast.makeText(this, "Google sign in failed: ${e.message}", Toast.LENGTH_SHORT).show()
+                    hideLoading()
                 }
+            } else {
+                hideLoading()
             }
         }
 
@@ -55,6 +63,8 @@ class CreateAccountActivity : AppCompatActivity() {
         val confirmPasswordEditText = findViewById<EditText>(R.id.editTextConfirmPassword)
         val createAccountButton = findViewById<Button>(R.id.btn_create_account)
         val btnGoogleSignIn = findViewById<MaterialButton>(R.id.btn_google_signup)
+        loadingAnimation = findViewById(R.id.loading_animation)
+        contentScrollView = findViewById(R.id.scroll_view)
 
         btnGoogleSignIn.setOnClickListener {
             signInWithGoogle()
@@ -75,8 +85,10 @@ class CreateAccountActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
+            showLoading()
             auth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this) { task ->
+                    hideLoading()
                     if (task.isSuccessful) {
                         // Sign in success, update UI with the signed-in user's information
                         val firebaseUser = auth.currentUser
@@ -100,7 +112,18 @@ class CreateAccountActivity : AppCompatActivity() {
         }
     }
 
+    private fun showLoading() {
+        contentScrollView.visibility = View.GONE
+        loadingAnimation.visibility = View.VISIBLE
+    }
+
+    private fun hideLoading() {
+        contentScrollView.visibility = View.VISIBLE
+        loadingAnimation.visibility = View.GONE
+    }
+
     private fun signInWithGoogle() {
+        showLoading()
         val signInIntent = googleSignInClient.signInIntent
         googleSignInLauncher.launch(signInIntent)
     }
@@ -109,6 +132,7 @@ class CreateAccountActivity : AppCompatActivity() {
         val credential = GoogleAuthProvider.getCredential(idToken, null)
         auth.signInWithCredential(credential)
             .addOnCompleteListener(this) { task ->
+                hideLoading()
                 if (task.isSuccessful) {
                     val firebaseUser = auth.currentUser
                     val user = User(id = firebaseUser!!.uid, name = firebaseUser.displayName ?: "", email = firebaseUser.email!!)

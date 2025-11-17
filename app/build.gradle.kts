@@ -51,6 +51,9 @@ dependencies {
     implementation("com.google.firebase:firebase-database")
     implementation("com.google.firebase:firebase-storage")
 
+    // Lottie
+    implementation("com.airbnb.android:lottie:6.4.1")
+
     // AndroidX & Testing Libraries (from Version Catalog)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
