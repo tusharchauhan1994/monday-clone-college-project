@@ -67,15 +67,13 @@
             android:gravity="center"/>
     </LinearLayout>
 
-    <!-- Center Illustration -->
-    <ImageView
+    <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/illustration_image"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:scaleType="fitCenter"
-        android:adjustViewBounds="true"
-        android:src="@drawable/start_center_logo"
-        android:contentDescription="Monday Illustration"
+        app:lottie_rawRes="@raw/start_ani"
+        app:lottie_autoPlay="true"
+        app:lottie_loop="true"
         app:layout_constraintTop_toBottomOf="@id/header_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -106,7 +104,7 @@
         android:layout_width="0dp"
         android:layout_height="56dp"
         android:text="Create new account"
-        android:textColor="#595DFF"
+        android.textColor="#595DFF"
         android:textSize="16sp"
         android:textAllCaps="false"
         android:background="@android:color/transparent"
