@@ -1,8 +1,10 @@
 package com.example.mondaycloneapp
 
+import android.animation.Animator
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -10,6 +12,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.airbnb.lottie.LottieAnimationView
 import com.example.mondaycloneapp.models.Board
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
@@ -22,6 +25,7 @@ class MyWorkActivity : AppCompatActivity() {
     private val db = FirebaseDatabase.getInstance().reference
     private val auth = FirebaseAuth.getInstance()
     private var boardsList = mutableListOf<Board>()
+    private lateinit var lottieAnimationView: LottieAnimationView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,6 +38,7 @@ class MyWorkActivity : AppCompatActivity() {
 
         rvBoards = findViewById(R.id.rv_my_work_boards)
         rvBoards.layoutManager = LinearLayoutManager(this)
+        lottieAnimationView = findViewById(R.id.lottie_animation_view)
 
         loadBoards()
 
@@ -124,20 +129,33 @@ class MyWorkActivity : AppCompatActivity() {
     }
 
     private fun deleteBoard(board: Board) {
-        val boardId = board.id
-        // Delete all tasks associated with the board
-        db.child("tasks").orderByChild("boardId").equalTo(boardId).addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                for (taskSnapshot in snapshot.children) {
-                    taskSnapshot.ref.removeValue()
-                }
-                // Delete the board itself
-                db.child("boards").child(boardId).removeValue()
+        lottieAnimationView.visibility = View.VISIBLE
+        lottieAnimationView.playAnimation()
+        lottieAnimationView.addAnimatorListener(object : Animator.AnimatorListener {
+            override fun onAnimationStart(animation: Animator) {}
+
+            override fun onAnimationEnd(animation: Animator) {
+                lottieAnimationView.visibility = View.GONE
+                val boardId = board.id
+                // Delete all tasks associated with the board
+                db.child("tasks").orderByChild("boardId").equalTo(boardId).addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        for (taskSnapshot in snapshot.children) {
+                            taskSnapshot.ref.removeValue()
+                        }
+                        // Delete the board itself
+                        db.child("boards").child(boardId).removeValue()
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        Log.e("MyWorkActivity", "Error deleting tasks for board", error.toException())
+                    }
+                })
             }
 
-            override fun onCancelled(error: DatabaseError) {
-                Log.e("MyWorkActivity", "Error deleting tasks for board", error.toException())
-            }
+            override fun onAnimationCancel(animation: Animator) {}
+
+            override fun onAnimationRepeat(animation: Animator) {}
         })
     }
 

@@ -33,13 +33,13 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@android:drawable/ic_menu_edit"
-            android:tint="#FFFFFF"
+            app:tint="#FFFFFF"
             android:layout_marginEnd="16dp"/>
         <ImageView
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@android:drawable/ic_menu_more"
-            android:tint="#FFFFFF"/>
+            app:tint="#FFFFFF"/>
     </LinearLayout>
 
     <!-- ScrollView Content -->
@@ -92,7 +92,7 @@
                             android:layout_width="40dp"
                             android:layout_height="40dp"
                             android:src="@android:drawable/ic_menu_directions"
-                            android:tint="@android:color/white"
+                            app:tint="@android:color/white"
                             android:background="?attr/selectableItemBackgroundBorderless"
                             android:padding="8dp"
                             android:rotation="180"/>
@@ -116,12 +116,25 @@
         android:layout_height="wrap_content"
         android:layout_margin="24dp"
         android:src="@android:drawable/ic_input_add"
-        android:tint="@android:color/white"
+        app:tint="@android:color/white"
         app:backgroundTint="#595DFF"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/bottom_navigation"
         app:fabSize="normal"
         app:elevation="6dp"/>
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/lottie_animation_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:lottie_rawRes="@raw/dust_bin"
+        app:lottie_autoPlay="false"
+        app:lottie_loop="false"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- Bottom Navigation -->
     <LinearLayout
@@ -151,7 +164,7 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/ic_home"
-                android:tint="#888888"
+                app:tint="#888888"
                 android:layout_marginBottom="4dp"/>
 
             <TextView
@@ -176,7 +189,7 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@android:drawable/ic_menu_agenda"
-                android:tint="#595DFF"
+                app:tint="#595DFF"
                 android:layout_marginBottom="4dp"/>
 
             <TextView
@@ -201,7 +214,7 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@android:drawable/ic_popup_reminder"
-                android:tint="#888888"
+                app:tint="#888888"
                 android:layout_marginBottom="4dp"/>
 
             <TextView
@@ -226,7 +239,7 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@android:drawable/ic_menu_more"
-                android:tint="#888888"
+                app:tint="#888888"
                 android:layout_marginBottom="4dp"/>
 
             <TextView
