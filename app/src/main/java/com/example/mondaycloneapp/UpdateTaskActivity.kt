@@ -1,7 +1,9 @@
 package com.example.mondaycloneapp
 
+import android.animation.Animator
 import android.app.DatePickerDialog
 import android.os.Bundle
+import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.Button
@@ -10,6 +12,7 @@ import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.airbnb.lottie.LottieAnimationView
 import com.example.mondaycloneapp.models.*
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -30,6 +33,7 @@ class UpdateTaskActivity : AppCompatActivity() {
     private lateinit var updateDueDate: TextView
     private lateinit var saveItemButton: Button
     private lateinit var deleteItemButton: Button
+    private lateinit var congratulationAnimation: LottieAnimationView
 
     private val users = mutableListOf<User>()
     private val userEmails = mutableListOf<String>()
@@ -48,6 +52,7 @@ class UpdateTaskActivity : AppCompatActivity() {
         updateDueDate = findViewById(R.id.update_due_date)
         saveItemButton = findViewById(R.id.save_item_button)
         deleteItemButton = findViewById(R.id.delete_item_button)
+        congratulationAnimation = findViewById(R.id.congratulation_animation)
 
         updateItemName.setText(originalItem.name)
         updateDueDate.text = originalItem.dueDate
@@ -107,6 +112,21 @@ class UpdateTaskActivity : AppCompatActivity() {
         // Save the updated item
         db.child("items").child(originalItem.id).setValue(updatedItem).addOnSuccessListener {
             Toast.makeText(this, "Item updated successfully", Toast.LENGTH_SHORT).show()
+
+            if (updatedItem.status == StatusOptions.DONE) {
+                congratulationAnimation.visibility = View.VISIBLE
+                congratulationAnimation.playAnimation()
+                congratulationAnimation.addAnimatorListener(object : Animator.AnimatorListener {
+                    override fun onAnimationStart(animation: Animator) { }
+                    override fun onAnimationEnd(animation: Animator) {
+                        finish()
+                    }
+                    override fun onAnimationCancel(animation: Animator) { }
+                    override fun onAnimationRepeat(animation: Animator) { }
+                })
+            } else {
+                finish()
+            }
             
             // --- Generate Notifications based on what changed ---
             generateNotifications(originalItem, updatedItem)
@@ -116,7 +136,6 @@ class UpdateTaskActivity : AppCompatActivity() {
                 addMemberToBoard(assignedUser.id, updatedItem.boardId)
             }
 
-            finish()
         }.addOnFailureListener {
             Toast.makeText(this, "Failed to update item", Toast.LENGTH_SHORT).show()
         }
