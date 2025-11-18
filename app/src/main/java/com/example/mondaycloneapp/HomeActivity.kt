@@ -1,5 +1,6 @@
 package com.example.mondaycloneapp
 
+import android.animation.Animator
 import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -9,6 +10,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -20,6 +22,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.airbnb.lottie.LottieAnimationView
 import com.example.mondaycloneapp.models.Board
 import com.example.mondaycloneapp.models.Item
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -38,6 +41,7 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var fabAddTask: FloatingActionButton
     private lateinit var boardsRecyclerView: RecyclerView
     private lateinit var boardAdapter: BoardAdapter
+    private lateinit var lottieAnimationView: LottieAnimationView
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -58,6 +62,7 @@ class HomeActivity : AppCompatActivity() {
         fabAddTask = findViewById(R.id.fab_add_task)
         boardsRecyclerView = findViewById(R.id.rv_boards)
         boardsRecyclerView.layoutManager = LinearLayoutManager(this)
+        lottieAnimationView = findViewById(R.id.lottie_animation_view)
 
         setupBottomNavigation()
         setupAuthStateListener()
@@ -260,18 +265,28 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun deleteBoard(board: Board) {
-        val boardId = board.id
-        db.child("tasks").orderByChild("boardId").equalTo(boardId).addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                for (taskSnapshot in snapshot.children) {
-                    taskSnapshot.ref.removeValue()
-                }
-                db.child("boards").child(boardId).removeValue()
-            }
+        lottieAnimationView.visibility = View.VISIBLE
+        lottieAnimationView.playAnimation()
+        lottieAnimationView.addAnimatorListener(object : Animator.AnimatorListener {
+            override fun onAnimationStart(animation: Animator) {}
+            override fun onAnimationEnd(animation: Animator) {
+                lottieAnimationView.visibility = View.GONE
+                val boardId = board.id
+                db.child("tasks").orderByChild("boardId").equalTo(boardId).addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        for (taskSnapshot in snapshot.children) {
+                            taskSnapshot.ref.removeValue()
+                        }
+                        db.child("boards").child(boardId).removeValue()
+                    }
 
-            override fun onCancelled(error: DatabaseError) {
-                Log.e("HomeActivity", "Error deleting tasks for board", error.toException())
+                    override fun onCancelled(error: DatabaseError) {
+                        Log.e("HomeActivity", "Error deleting tasks for board", error.toException())
+                    }
+                })
             }
+            override fun onAnimationCancel(animation: Animator) {}
+            override fun onAnimationRepeat(animation: Animator) {}
         })
     }
 
