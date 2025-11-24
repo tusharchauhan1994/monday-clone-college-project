@@ -210,6 +210,7 @@ class HomeActivity : AppCompatActivity() {
                         showBoardOptionsDialog(board)
                     }
                     boardsRecyclerView.adapter = boardAdapter
+                    BoardWidgetProvider.sendRefreshBroadcast(this@HomeActivity)
                 }
 
                 override fun onCancelled(error: DatabaseError) {
@@ -255,7 +256,9 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun renameBoard(board: Board, newName: String) {
-        db.child("boards").child(board.id).child("name").setValue(newName)
+        db.child("boards").child(board.id).child("name").setValue(newName).addOnSuccessListener {
+            BoardWidgetProvider.sendRefreshBroadcast(this)
+        }
     }
 
     private fun showDeleteBoardConfirmationDialog(board: Board) {
@@ -282,7 +285,9 @@ class HomeActivity : AppCompatActivity() {
                         for (taskSnapshot in snapshot.children) {
                             taskSnapshot.ref.removeValue()
                         }
-                        db.child("boards").child(boardId).removeValue()
+                        db.child("boards").child(boardId).removeValue().addOnSuccessListener {
+                            BoardWidgetProvider.sendRefreshBroadcast(this@HomeActivity)
+                        }
                     }
 
                     override fun onCancelled(error: DatabaseError) {

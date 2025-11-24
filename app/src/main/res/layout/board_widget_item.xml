@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="12dp"
+    android:background="#2A2D32">
+
+    <!-- Board Icon with colored bars -->
+    <ImageView
+        android:id="@+id/board_icon_container"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:background="#3A3D42"
+        android:padding="6dp"
+        android:src="@drawable/board_icon"/>
+
+    <!-- Board Name -->
+    <TextView
+        android:id="@+id/tv_board_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/board_icon_container"
+        android:layout_marginStart="14dp"
+        android:text="Board Name"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"/>
+
+    <!-- Last Changed Time -->
+    <TextView
+        android:id="@+id/tv_last_changed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_board_name"
+        android:layout_toEndOf="@id/board_icon_container"
+        android:layout_marginStart="14dp"
+        android:layout_marginTop="2dp"
+        android:text="Changed 1min ago"
+        android:textColor="#888888"
+        android:textSize="13sp"/>
+
+    <!-- Star Icon -->
+    <ImageView
+        android:id="@+id/iv_star"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@android:drawable/btn_star_big_off"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="8dp"/>
+
+</RelativeLayout>
