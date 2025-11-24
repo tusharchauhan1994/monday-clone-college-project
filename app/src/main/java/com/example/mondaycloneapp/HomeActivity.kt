@@ -36,7 +36,6 @@ class HomeActivity : AppCompatActivity() {
     private var authStateListener: FirebaseAuth.AuthStateListener? = null
     private var tasksChildListener: ChildEventListener? = null
     private val tasksRef = db.child("tasks")
-    private var isInitialDataLoaded = false
 
     private lateinit var fabAddTask: FloatingActionButton
     private lateinit var boardsRecyclerView: RecyclerView
@@ -119,12 +118,14 @@ class HomeActivity : AppCompatActivity() {
 
     private fun listenForTaskAssignments(userId: String) {
         tasksChildListener?.let { tasksRef.removeEventListener(it) }
-        isInitialDataLoaded = false
+
+        // This flag helps differentiate initial data from subsequent changes.
+        var isInitialDataLoaded = false
 
         tasksRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 isInitialDataLoaded = true
-                Log.d("NotificationDebug", "Initial data load complete. Ready for new assignments.")
+                Log.d("NotificationDebug", "Initial data snapshot received. Listening for live changes.")
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -152,13 +153,15 @@ class HomeActivity : AppCompatActivity() {
             }
 
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-                if (!isInitialDataLoaded) return // Ignore the initial data dump at startup
-                checkAssignment(snapshot, "onChildAdded (NEW TASK)")
+                if (isInitialDataLoaded) {
+                    checkAssignment(snapshot, "onChildAdded (NEW TASK)")
+                }
             }
 
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-                 if (!isInitialDataLoaded) return
-                checkAssignment(snapshot, "onChildChanged (UPDATED TASK)")
+                if (isInitialDataLoaded) {
+                    checkAssignment(snapshot, "onChildChanged (UPDATED TASK)")
+                }
             }
 
             override fun onChildRemoved(snapshot: DataSnapshot) {}
@@ -169,12 +172,14 @@ class HomeActivity : AppCompatActivity() {
         })
     }
 
+
     private fun showNotification(title: String, message: String) {
         val channelId = "task_assignment_channel"
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentTitle(title)
             .setContentText(message)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
 
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -183,7 +188,7 @@ class HomeActivity : AppCompatActivity() {
             val channel = NotificationChannel(
                 channelId,
                 "Task Assignments",
-                NotificationManager.IMPORTANCE_DEFAULT
+                NotificationManager.IMPORTANCE_HIGH
             )
             notificationManager.createNotificationChannel(channel)
         }

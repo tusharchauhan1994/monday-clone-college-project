@@ -14,6 +14,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.airbnb.lottie.LottieAnimationView
 import com.example.mondaycloneapp.models.*
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -38,6 +39,7 @@ class UpdateTaskActivity : AppCompatActivity() {
     private val users = mutableListOf<User>()
     private val userEmails = mutableListOf<String>()
     private val db = FirebaseDatabase.getInstance().reference
+    private val auth = FirebaseAuth.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -142,30 +144,52 @@ class UpdateTaskActivity : AppCompatActivity() {
     }
 
     private fun generateNotifications(original: Item, updated: Item) {
-        val assigneeId = updated.assignee ?: return
+        val boardId = updated.boardId
+        db.child("boards").child(boardId).addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val board = snapshot.getValue(Board::class.java)
+                board?.let {
+                    val usersToNotify = mutableSetOf<String>()
+                    usersToNotify.addAll(it.members.keys)
+                    usersToNotify.add(it.ownerId)
+                    auth.currentUser?.uid?.let { updaterId -> usersToNotify.add(updaterId) }
 
-        // 1. Assignment Change
-        if (original.assignee != updated.assignee) {
-            createNotification(assigneeId, NotificationType.TASK_ASSIGNMENT, "You've been assigned a new task", "Task: ${updated.name}")
-        }
+                    // 1. Assignment Change
+                    if (original.assignee != updated.assignee) {
+                        val assigneeName = users.find { user -> user.id == updated.assignee }?.name ?: "unassigned"
+                        notifyUsers(usersToNotify, NotificationType.TASK_ASSIGNMENT, "Task Reassigned", "Task '${updated.name}' has been assigned to $assigneeName")
+                    }
 
-        // 2. Status Change
-        if (original.status != updated.status) {
-            if (updated.status == StatusOptions.DONE) {
-                 createNotification(assigneeId, NotificationType.TASK_COMPLETED, "Task Completed!", "You've completed the task: ${updated.name}")
-            } else {
-                 createNotification(assigneeId, NotificationType.STATUS_CHANGE, "Task Status Updated", "Status for '${updated.name}' changed from ${original.status} to ${updated.status}")
+                    // 2. Status Change
+                    if (original.status != updated.status) {
+                        if (updated.status == StatusOptions.DONE) {
+                            notifyUsers(usersToNotify, NotificationType.TASK_COMPLETED, "Task Completed!", "Task '${updated.name}' has been completed.")
+                        } else {
+                            notifyUsers(usersToNotify, NotificationType.STATUS_CHANGE, "Task Status Updated", "Status for '${updated.name}' changed from ${original.status} to ${updated.status}")
+                        }
+                    }
+
+                    // 3. Due Date Change
+                    if (original.dueDate != updated.dueDate) {
+                        notifyUsers(usersToNotify, NotificationType.DUE_DATE_UPDATE, "Due Date Changed", "The due date for '${updated.name}' has been changed to ${updated.dueDate}")
+                    }
+
+                    // 4. Priority Change
+                    if (original.priority != updated.priority && updated.priority == PriorityOptions.HIGH) {
+                        notifyUsers(usersToNotify, NotificationType.PRIORITY_CHANGE, "Priority Set to HIGH", "The priority for task '${updated.name}' is now HIGH.")
+                    }
+                }
             }
-        }
 
-        // 3. Due Date Change
-        if (original.dueDate != updated.dueDate) {
-            createNotification(assigneeId, NotificationType.DUE_DATE_UPDATE, "Due Date Changed", "The due date for '${updated.name}' has been changed to ${updated.dueDate}")
-        }
-
-        // 4. Priority Change
-        if (original.priority != updated.priority && updated.priority == PriorityOptions.HIGH) {
-             createNotification(assigneeId, NotificationType.PRIORITY_CHANGE, "Priority Set to HIGH", "The priority for task '${updated.name}' is now HIGH.")
+            override fun onCancelled(error: DatabaseError) {
+                // Handle error
+            }
+        })
+    }
+    
+    private fun notifyUsers(userIds: Set<String>, type: String, title: String, message: String) {
+        for (userId in userIds) {
+            createNotification(userId, type, title, message)
         }
     }
 
