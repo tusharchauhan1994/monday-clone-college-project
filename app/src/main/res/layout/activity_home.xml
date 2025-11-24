@@ -206,7 +206,7 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android.layout_marginBottom="24dp"
+                android:layout_marginBottom="24dp"
                 app:cardCornerRadius="24dp"
                 app:cardElevation="0dp"
                 app:cardBackgroundColor="#2A2D32">
@@ -257,6 +257,7 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
                 android:layout_marginBottom="80dp"
                 app:cardCornerRadius="24dp"
                 app:cardElevation="0dp"
