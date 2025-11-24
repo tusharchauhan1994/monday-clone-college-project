@@ -21,7 +21,7 @@ class BoardAdapter(
         val boardName: TextView = itemView.findViewById(R.id.tv_board_name)
         val lastChanged: TextView = itemView.findViewById(R.id.tv_last_changed)
         val starIcon: ImageView = itemView.findViewById(R.id.iv_star)
-        val boardIcon: ImageView = itemView.findViewById(R.id.iv_board_icon)
+        val boardIcon: ImageView = itemView.findViewById(R.id.board_icon_container)
 
         fun bind(board: Board) {
             boardName.text = board.name

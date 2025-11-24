@@ -10,76 +10,15 @@
     android:paddingEnd="8dp"
     android:background="?attr/selectableItemBackground">
 
-    <!-- Board Icon with colored bars -->
-    <androidx.cardview.widget.CardView
+    <ImageView
         android:id="@+id/board_icon_container"
         android:layout_width="56dp"
         android:layout_height="56dp"
-        app:cardCornerRadius="8dp"
-        app:cardElevation="0dp"
-        app:cardBackgroundColor="#3A3D42"
+        android:background="#3A3D42"
+        android:src="@drawable/board_icon"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:padding="6dp">
-
-            <!-- Monday logo icon -->
-            <ImageView
-                android:id="@+id/iv_board_icon"
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:src="@android:drawable/ic_menu_gallery"
-                android:tint="#595DFF"
-                android:layout_marginBottom="3dp"/>
-
-            <!-- Three gray columns -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:orientation="horizontal"
-                android:layout_marginBottom="2dp">
-
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:background="#555555"
-                    android:layout_marginEnd="1.5dp"/>
-
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:background="#555555"
-                    android:layout_marginEnd="1.5dp"/>
-
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:background="#555555"/>
-            </LinearLayout>
-
-            <!-- Green row -->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="2.5dp"
-                android:background="#00D647"
-                android:layout_marginBottom="1.5dp"/>
-
-            <!-- Red row -->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="2.5dp"
-                android:background="#E44258"/>
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
     <!-- Board Name -->
     <TextView
