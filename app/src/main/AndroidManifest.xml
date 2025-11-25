@@ -33,6 +33,7 @@
         <activity android:name=".MoreActivity"/>
         <activity android:name=".TaskListActivity"/>
         <activity android:name=".UpdateTaskActivity"/>
+        <activity android:name=".ContactUsActivity"/>
 
         <service
             android:name=".FirebaseMessageReceiver"

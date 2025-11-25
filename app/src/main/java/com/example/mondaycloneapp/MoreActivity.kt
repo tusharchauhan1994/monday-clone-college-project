@@ -50,6 +50,7 @@ class MoreActivity : AppCompatActivity() {
         val btnNotifications: LinearLayout = findViewById(R.id.btn_nav_notifications)
         val btnMore: LinearLayout = findViewById(R.id.btn_nav_more)
         val tvLogout: TextView = findViewById(R.id.tv_logout)
+        val tvContactUs: TextView = findViewById(R.id.tv_contact_us)
 
         fun navigateTo(targetActivity: Class<*>) {
             val intent = Intent(this, targetActivity).apply {
@@ -62,6 +63,7 @@ class MoreActivity : AppCompatActivity() {
         btnMyWork.setOnClickListener { navigateTo(MyWorkActivity::class.java) }
         btnNotifications.setOnClickListener { navigateTo(NotificationsActivity::class.java) }
         btnMore.setOnClickListener { /* Already on More, do nothing */ }
+        tvContactUs.setOnClickListener { startActivity(Intent(this, ContactUsActivity::class.java)) }
 
         tvLogout.setOnClickListener {
             AlertDialog.Builder(this)

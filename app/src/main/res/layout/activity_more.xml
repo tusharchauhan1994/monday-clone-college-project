@@ -164,6 +164,18 @@
                     app:drawableStartCompat="@android:drawable/ic_menu_compass"
                     app:drawableEndCompat="@android:drawable/ic_media_next"
                     android:paddingVertical="14dp"/>
+                
+                <View android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#222222"/>
+
+                <TextView
+                    android:id="@+id/tv_contact_us"
+                    style="@style/MenuItemStyle"
+                    android:text="Contact Us"
+                    app:drawableStartCompat="@android:drawable/ic_menu_call"
+                    app:drawableEndCompat="@android:drawable/ic_media_next"
+                    android:paddingVertical="14dp"/>
             </LinearLayout>
 
             <!-- LOGOUT -->
