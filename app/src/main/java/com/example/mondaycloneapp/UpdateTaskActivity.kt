@@ -156,6 +156,7 @@ class UpdateTaskActivity : AppCompatActivity() {
 
                     // 1. Assignment Change
                     if (original.assignee != updated.assignee) {
+                        updated.assignee?.let { usersToNotify.add(it) }
                         val assigneeName = users.find { user -> user.id == updated.assignee }?.name ?: "unassigned"
                         notifyUsers(usersToNotify, NotificationType.TASK_ASSIGNMENT, "Task Reassigned", "Task '${updated.name}' has been assigned to $assigneeName")
                     }
