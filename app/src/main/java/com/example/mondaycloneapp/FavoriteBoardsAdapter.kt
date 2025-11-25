@@ -11,7 +11,8 @@ import com.example.mondaycloneapp.models.Board
 class FavoriteBoardsAdapter(
     private var boards: List<Board>,
     private val onAddBoardClick: () -> Unit,
-    private val onBoardClick: (Board) -> Unit
+    private val onBoardClick: (Board) -> Unit,
+    private val onStarClick: (Board) -> Unit
 ) : RecyclerView.Adapter<FavoriteBoardsAdapter.FavoriteBoardViewHolder>() {
 
     private val TYPE_ADD = 0
@@ -19,7 +20,7 @@ class FavoriteBoardsAdapter(
 
     override fun getItemViewType(position: Int): Int {
         return if (boards.isEmpty()) TYPE_ADD else {
-            if (position == 0) TYPE_BOARD else TYPE_ADD
+            if (position < boards.size) TYPE_BOARD else TYPE_ADD
         }
     }
 
@@ -33,12 +34,12 @@ class FavoriteBoardsAdapter(
         if (getItemViewType(position) == TYPE_ADD) {
             holder.bindAddButton(onAddBoardClick)
         } else {
-            holder.bind(boards[position], onBoardClick)
+            holder.bind(boards[position], onBoardClick, onStarClick)
         }
     }
 
     override fun getItemCount(): Int {
-        return if (boards.isEmpty()) 1 else boards.size + 1
+        return boards.size + 1
     }
 
     fun updateBoards(newBoards: List<Board>) {
@@ -54,15 +55,19 @@ class FavoriteBoardsAdapter(
         private val boardPreviewImageView: ImageView = itemView.findViewById(R.id.iv_board_preview)
         private val bottomContainer: View = itemView.findViewById(R.id.bottom_container)
 
-        fun bind(board: Board, onBoardClick: (Board) -> Unit) {
+        fun bind(board: Board, onBoardClick: (Board) -> Unit, onStarClick: (Board) -> Unit) {
             boardNameTextView.text = board.name
             workspaceNameTextView.text = "Main workspace" // This is a placeholder
             addFavoriteImageView.visibility = View.GONE
             starImageView.visibility = View.VISIBLE
             boardPreviewImageView.visibility = View.VISIBLE
             bottomContainer.visibility = View.VISIBLE
+
             itemView.setOnClickListener {
                 onBoardClick(board)
+            }
+            starImageView.setOnClickListener {
+                onStarClick(board)
             }
         }
 

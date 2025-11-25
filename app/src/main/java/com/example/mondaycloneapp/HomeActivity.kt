@@ -96,6 +96,7 @@ class HomeActivity : AppCompatActivity() {
             val user = firebaseAuth.currentUser
             if (user != null) {
                 Log.d("NotificationDebug", "Auth state confirmed. User ID: ${user.uid}")
+                initFavoriteBoardsAdapter()
                 loadBoards(user.uid)
                 loadFavoriteBoards(user.uid)
                 listenForTaskAssignments(user.uid)
@@ -103,6 +104,20 @@ class HomeActivity : AppCompatActivity() {
                 Log.d("NotificationDebug", "User is signed out.")
             }
         }
+    }
+
+    private fun initFavoriteBoardsAdapter() {
+        favoriteBoardsAdapter = FavoriteBoardsAdapter(emptyList(), {
+            auth.currentUser?.uid?.let { showAddFavoriteDialog(it) }
+        }, { board ->
+            val intent = Intent(this@HomeActivity, TaskListActivity::class.java)
+            intent.putExtra("BOARD_ID", board.id)
+            intent.putExtra("BOARD_NAME", board.name)
+            startActivity(intent)
+        }, { board ->
+            auth.currentUser?.uid?.let { toggleFavorite(it, board.id) }
+        })
+        favoriteBoardsRecyclerView.adapter = favoriteBoardsAdapter
     }
 
     private fun askNotificationPermission() {
@@ -235,15 +250,7 @@ class HomeActivity : AppCompatActivity() {
                             val favoriteBoards = favoriteBoardIds.mapNotNull { boardId ->
                                 boardSnapshot.child(boardId).getValue(Board::class.java)
                             }
-                            favoriteBoardsAdapter = FavoriteBoardsAdapter(favoriteBoards, {
-                                showAddFavoriteDialog(userId)
-                            }) { board ->
-                                val intent = Intent(this@HomeActivity, TaskListActivity::class.java)
-                                intent.putExtra("BOARD_ID", board.id)
-                                intent.putExtra("BOARD_NAME", board.name)
-                                startActivity(intent)
-                            }
-                            favoriteBoardsRecyclerView.adapter = favoriteBoardsAdapter
+                            favoriteBoardsAdapter.updateBoards(favoriteBoards)
                         }
 
                         override fun onCancelled(error: DatabaseError) {
@@ -251,15 +258,7 @@ class HomeActivity : AppCompatActivity() {
                         }
                     })
                 } else {
-                    favoriteBoardsAdapter = FavoriteBoardsAdapter(emptyList(), {
-                        showAddFavoriteDialog(userId)
-                    }) { board ->
-                        val intent = Intent(this@HomeActivity, TaskListActivity::class.java)
-                        intent.putExtra("BOARD_ID", board.id)
-                        intent.putExtra("BOARD_NAME", board.name)
-                        startActivity(intent)
-                    }
-                    favoriteBoardsRecyclerView.adapter = favoriteBoardsAdapter
+                    favoriteBoardsAdapter.updateBoards(emptyList())
                 }
             }
 
@@ -396,6 +395,9 @@ class HomeActivity : AppCompatActivity() {
                         }
                         db.child("boards").child(boardId).removeValue().addOnSuccessListener {
                             BoardWidgetProvider.sendRefreshBroadcast(this@HomeActivity)
+                        }
+                        auth.currentUser?.uid?.let { userId ->
+                            db.child("users").child(userId).child("favorites").child(boardId).removeValue()
                         }
                     }
 

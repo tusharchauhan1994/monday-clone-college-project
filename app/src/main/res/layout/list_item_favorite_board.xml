@@ -44,7 +44,7 @@
                 android:ellipsize="end"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app.layout_constraintEnd_toStartOf="@+id/iv_star"
+                app:layout_constraintEnd_toStartOf="@+id/iv_star"
                 tools:text="Start from scratch" />
 
             <TextView
@@ -62,8 +62,7 @@
                 android:id="@+id/iv_star"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:src="@android:drawable/btn_star_big_off"
-                app:tint="#FFD700"
+                android:src="@drawable/ic_star_filled"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
