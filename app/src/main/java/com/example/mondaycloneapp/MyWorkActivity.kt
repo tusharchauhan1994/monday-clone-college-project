@@ -8,6 +8,7 @@ import android.view.View
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -26,6 +27,9 @@ class MyWorkActivity : AppCompatActivity() {
     private val auth = FirebaseAuth.getInstance()
     private var boardsList = mutableListOf<Board>()
     private lateinit var lottieAnimationView: LottieAnimationView
+    private var authStateListener: FirebaseAuth.AuthStateListener? = null
+    private var boardsQuery: Query? = null
+    private var boardsListener: ValueEventListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,16 +44,63 @@ class MyWorkActivity : AppCompatActivity() {
         rvBoards.layoutManager = LinearLayoutManager(this)
         lottieAnimationView = findViewById(R.id.lottie_animation_view)
 
-        loadBoards()
-
+        initRecyclerView()
+        setupAuthStateListener()
         setupBottomNavigation()
     }
 
-    private fun loadBoards() {
-        val userId = auth.currentUser?.uid ?: return
+    private fun initRecyclerView() {
+        boardAdapter = BoardAdapter(
+            context = this@MyWorkActivity,
+            boards = boardsList,
+            onBoardClick = { board ->
+                val intent = Intent(this@MyWorkActivity, TaskListActivity::class.java)
+                intent.putExtra("BOARD_ID", board.id)
+                intent.putExtra("BOARD_NAME", board.name)
+                startActivity(intent)
+            },
+            onBoardLongClick = { board ->
+                showBoardOptionsDialog(board)
+            },
+            onStarClick = { board ->
+                auth.currentUser?.uid?.let { userId ->
+                    toggleFavorite(userId, board.id)
+                }
+            }
+        )
+        rvBoards.adapter = boardAdapter
+    }
 
-        db.child("boards").orderByChild("ownerId").equalTo(userId)
-            .addValueEventListener(object : ValueEventListener {
+    override fun onStart() {
+        super.onStart()
+        authStateListener?.let { auth.addAuthStateListener(it) }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        authStateListener?.let { auth.removeAuthStateListener(it) }
+        boardsListener?.let { boardsQuery?.removeEventListener(it) }
+    }
+
+    private fun setupAuthStateListener() {
+        authStateListener = FirebaseAuth.AuthStateListener { firebaseAuth ->
+            val user = firebaseAuth.currentUser
+            if (user != null) {
+                Toast.makeText(this, "Logged in with UID: ${user.uid}", Toast.LENGTH_LONG).show()
+                loadBoards(user.uid)
+            } else {
+                boardsList.clear()
+                boardAdapter.updateBoards(boardsList)
+                boardsListener?.let { boardsQuery?.removeEventListener(it) }
+            }
+        }
+    }
+
+    private fun loadBoards(userId: String) {
+        boardsListener?.let { boardsQuery?.removeEventListener(it) }
+
+        boardsQuery = db.child("boards").orderByChild("members/$userId").equalTo(true)
+        boardsListener = object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     boardsList.clear()
                     for (boardSnapshot in snapshot.children) {
@@ -58,38 +109,23 @@ class MyWorkActivity : AppCompatActivity() {
                             boardsList.add(board)
                         }
                     }
-                    boardAdapter = BoardAdapter(
-                        context = this@MyWorkActivity,
-                        boards = boardsList,
-                        onBoardClick = { board ->
-                            val intent = Intent(this@MyWorkActivity, TaskListActivity::class.java)
-                            intent.putExtra("BOARD_ID", board.id)
-                            intent.putExtra("BOARD_NAME", board.name)
-                            startActivity(intent)
-                        },
-                        onBoardLongClick = { board ->
-                            showBoardOptionsDialog(board)
-                        },
-                        onStarClick = { board ->
-                            auth.currentUser?.uid?.let { userId ->
-                                toggleFavorite(userId, board.id)
-                            }
-                        }
-                    )
-                    rvBoards.adapter = boardAdapter
+                    if (isDestroyed || isFinishing) return
+                    boardAdapter.updateBoards(boardsList)
                     Log.d("MyWorkActivity", "Successfully loaded ${boardsList.size} boards.")
                 }
 
                 override fun onCancelled(error: DatabaseError) {
                     Log.e("MyWorkActivity", "Error loading boards", error.toException())
                 }
-            })
+            }
+        boardsQuery?.addValueEventListener(boardsListener!!)
     }
 
     private fun toggleFavorite(uid: String, boardId: String) {
+        Toast.makeText(this, "Toggling favorite for UID: $uid", Toast.LENGTH_LONG).show()
         val favoriteRef = db.child("users").child(uid).child("favorites").child(boardId)
-        favoriteRef.get().addOnSuccessListener {
-            if (it.exists()) {
+        favoriteRef.get().addOnSuccessListener { snapshot ->
+            if (snapshot.exists()) {
                 favoriteRef.removeValue()
             } else {
                 favoriteRef.setValue(true)
@@ -173,13 +209,11 @@ class MyWorkActivity : AppCompatActivity() {
             override fun onAnimationEnd(animation: Animator) {
                 lottieAnimationView.visibility = View.GONE
                 val boardId = board.id
-                // Delete all tasks associated with the board
                 db.child("tasks").orderByChild("boardId").equalTo(boardId).addListenerForSingleValueEvent(object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
                         for (taskSnapshot in snapshot.children) {
                             taskSnapshot.ref.removeValue()
                         }
-                        // Delete the board itself
                         db.child("boards").child(boardId).removeValue()
                     }
 

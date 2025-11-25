@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit
 
 class BoardAdapter(
     private val context: Context,
-    private val boards: List<Board>,
+    private var boards: List<Board>,
     private val onBoardClick: (Board) -> Unit,
     private val onBoardLongClick: (Board) -> Unit,
     private val onStarClick: (Board) -> Unit
@@ -22,6 +22,11 @@ class BoardAdapter(
 
     private val db = FirebaseDatabase.getInstance().reference
     private val userId = FirebaseAuth.getInstance().currentUser?.uid
+
+    fun updateBoards(newBoards: List<Board>) {
+        boards = newBoards
+        notifyDataSetChanged()
+    }
 
     inner class BoardViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val boardName: TextView = itemView.findViewById(R.id.tv_board_name)

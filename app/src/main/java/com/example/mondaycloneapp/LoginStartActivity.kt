@@ -124,10 +124,14 @@ class LoginStartActivity : AppCompatActivity() {
                 hideLoading()
                 if (task.isSuccessful) {
                     val firebaseUser = auth.currentUser
-                    val user = User(id = firebaseUser!!.uid, name = firebaseUser.displayName ?: "", email = firebaseUser.email!!)
+                    val userUpdates = hashMapOf<String, Any>(
+                        "id" to firebaseUser!!.uid,
+                        "name" to (firebaseUser.displayName ?: ""),
+                        "email" to firebaseUser.email!!
+                    )
 
                     val database = FirebaseDatabase.getInstance().getReference("users")
-                    database.child(firebaseUser.uid).setValue(user).addOnCompleteListener { 
+                    database.child(firebaseUser.uid).updateChildren(userUpdates).addOnCompleteListener { 
                         saveUserFcmToken()
                         Toast.makeText(this, "Google Login successful!", Toast.LENGTH_SHORT).show()
                         val intent = Intent(this, HomeActivity::class.java)
