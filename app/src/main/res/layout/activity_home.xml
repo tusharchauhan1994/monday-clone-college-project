@@ -37,7 +37,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="monday\nwork management"
+                android:text="monday
+work management"
                 android:textColor="@android:color/white"
                 android:textSize="16sp"
                 android:textStyle="bold"
@@ -118,87 +119,14 @@
                             android:rotation="180"/>
                     </LinearLayout>
 
-                    <!-- Horizontal ScrollView for cards -->
-                    <HorizontalScrollView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:scrollbars="none">
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal">
-
-                            <!-- Add Card -->
-                            <androidx.cardview.widget.CardView
-                                android:layout_width="280dp"
-                                android:layout_height="200dp"
-                                android:layout_marginEnd="12dp"
-                                app:cardCornerRadius="16dp"
-                                app:cardElevation="0dp"
-                                app:cardBackgroundColor="#4A4DCC">
-
-                                <LinearLayout
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:gravity="center"
-                                    android:orientation="vertical">
-
-                                    <TextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:text="+"
-                                        android:textColor="@android:color/white"
-                                        android:textSize="72sp"/>
-                                </LinearLayout>
-                            </androidx.cardview.widget.CardView>
-
-                            <!-- Placeholder cards -->
-                            <androidx.cardview.widget.CardView
-                                android:layout_width="120dp"
-                                android:layout_height="200dp"
-                                android:layout_marginEnd="12dp"
-                                app:cardCornerRadius="16dp"
-                                app:cardElevation="0dp"
-                                app:cardBackgroundColor="#4A4DCC"/>
-
-                            <androidx.cardview.widget.CardView
-                                android:layout_width="120dp"
-                                android:layout_height="200dp"
-                                app:cardCornerRadius="16dp"
-                                app:cardElevation="0dp"
-                                app:cardBackgroundColor="#4A4DCC"/>
-                        </LinearLayout>
-                    </HorizontalScrollView>
-
-                    <!-- Dots Indicator -->
-                    <LinearLayout
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rv_favorite_boards"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:gravity="center"
-                        android:layout_marginTop="16dp">
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                        tools:listitem="@layout/list_item_favorite_board"/>
 
-                        <View
-                            android:layout_width="8dp"
-                            android:layout_height="8dp"
-                            android:background="@android:drawable/presence_offline"
-                            android:backgroundTint="#FFFFFF"
-                            android:layout_marginEnd="8dp"/>
-
-                        <View
-                            android:layout_width="8dp"
-                            android:layout_height="8dp"
-                            android:background="@android:drawable/presence_offline"
-                            android:backgroundTint="#80FFFFFF"
-                            android:layout_marginEnd="8dp"/>
-
-                        <View
-                            android:layout_width="8dp"
-                            android:layout_height="8dp"
-                            android:background="@android:drawable/presence_offline"
-                            android:backgroundTint="#80FFFFFF"/>
-                    </LinearLayout>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 

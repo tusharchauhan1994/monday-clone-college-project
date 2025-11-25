@@ -39,7 +39,9 @@ class HomeActivity : AppCompatActivity() {
 
     private lateinit var fabAddTask: FloatingActionButton
     private lateinit var boardsRecyclerView: RecyclerView
+    private lateinit var favoriteBoardsRecyclerView: RecyclerView
     private lateinit var boardAdapter: BoardAdapter
+    private lateinit var favoriteBoardsAdapter: FavoriteBoardsAdapter
     private lateinit var lottieAnimationView: LottieAnimationView
 
     private val requestPermissionLauncher = registerForActivityResult(
@@ -60,7 +62,9 @@ class HomeActivity : AppCompatActivity() {
 
         fabAddTask = findViewById(R.id.fab_add_task)
         boardsRecyclerView = findViewById(R.id.rv_boards)
+        favoriteBoardsRecyclerView = findViewById(R.id.rv_favorite_boards)
         boardsRecyclerView.layoutManager = LinearLayoutManager(this)
+        favoriteBoardsRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         lottieAnimationView = findViewById(R.id.lottie_animation_view)
 
         setupBottomNavigation()
@@ -93,6 +97,7 @@ class HomeActivity : AppCompatActivity() {
             if (user != null) {
                 Log.d("NotificationDebug", "Auth state confirmed. User ID: ${user.uid}")
                 loadBoards(user.uid)
+                loadFavoriteBoards(user.uid)
                 listenForTaskAssignments(user.uid)
             } else {
                 Log.d("NotificationDebug", "User is signed out.")
@@ -112,6 +117,7 @@ class HomeActivity : AppCompatActivity() {
         val uid = auth.currentUser?.uid
         if (uid != null) {
             loadBoards(uid)
+            loadFavoriteBoards(uid)
             Toast.makeText(this, "Board list refreshed!", Toast.LENGTH_SHORT).show()
         }
     }
@@ -119,7 +125,6 @@ class HomeActivity : AppCompatActivity() {
     private fun listenForTaskAssignments(userId: String) {
         tasksChildListener?.let { tasksRef.removeEventListener(it) }
 
-        // This flag helps differentiate initial data from subsequent changes.
         var isInitialDataLoaded = false
 
         tasksRef.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -172,7 +177,6 @@ class HomeActivity : AppCompatActivity() {
         })
     }
 
-
     private fun showNotification(title: String, message: String) {
         val channelId = "task_assignment_channel"
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
@@ -206,8 +210,10 @@ class HomeActivity : AppCompatActivity() {
                         intent.putExtra("BOARD_ID", board.id)
                         intent.putExtra("BOARD_NAME", board.name)
                         startActivity(intent)
-                    }) { board ->
+                    }, { board ->
                         showBoardOptionsDialog(board)
+                    }) { board ->
+                        toggleFavorite(userId, board.id)
                     }
                     boardsRecyclerView.adapter = boardAdapter
                     BoardWidgetProvider.sendRefreshBroadcast(this@HomeActivity)
@@ -215,6 +221,81 @@ class HomeActivity : AppCompatActivity() {
 
                 override fun onCancelled(error: DatabaseError) {
                     Log.w("HomeActivity", "Failed to load boards.", error.toException())
+                }
+            })
+    }
+
+    private fun loadFavoriteBoards(userId: String) {
+        db.child("users").child(userId).child("favorites").addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val favoriteBoardIds = snapshot.children.mapNotNull { it.key }
+                if (favoriteBoardIds.isNotEmpty()) {
+                    db.child("boards").addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onDataChange(boardSnapshot: DataSnapshot) {
+                            val favoriteBoards = favoriteBoardIds.mapNotNull { boardId ->
+                                boardSnapshot.child(boardId).getValue(Board::class.java)
+                            }
+                            favoriteBoardsAdapter = FavoriteBoardsAdapter(favoriteBoards, {
+                                showAddFavoriteDialog(userId)
+                            }) { board ->
+                                val intent = Intent(this@HomeActivity, TaskListActivity::class.java)
+                                intent.putExtra("BOARD_ID", board.id)
+                                intent.putExtra("BOARD_NAME", board.name)
+                                startActivity(intent)
+                            }
+                            favoriteBoardsRecyclerView.adapter = favoriteBoardsAdapter
+                        }
+
+                        override fun onCancelled(error: DatabaseError) {
+                            Log.w("HomeActivity", "Failed to load favorite boards.", error.toException())
+                        }
+                    })
+                } else {
+                    favoriteBoardsAdapter = FavoriteBoardsAdapter(emptyList(), {
+                        showAddFavoriteDialog(userId)
+                    }) { board ->
+                        val intent = Intent(this@HomeActivity, TaskListActivity::class.java)
+                        intent.putExtra("BOARD_ID", board.id)
+                        intent.putExtra("BOARD_NAME", board.name)
+                        startActivity(intent)
+                    }
+                    favoriteBoardsRecyclerView.adapter = favoriteBoardsAdapter
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.w("HomeActivity", "Failed to load favorite board IDs.", error.toException())
+            }
+        })
+    }
+
+    private fun showAddFavoriteDialog(userId: String) {
+        db.child("boards").orderByChild("members/$userId").equalTo(true)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val boards = snapshot.children.mapNotNull { it.getValue(Board::class.java) }
+                    val boardNames = boards.map { it.name }.toTypedArray()
+                    val favoriteBoardIds = boards.map { it.id }.toTypedArray()
+                    val checkedItems = boards.map { board ->
+                        favoriteBoardIds.contains(board.id)
+                    }.toBooleanArray()
+
+                    AlertDialog.Builder(this@HomeActivity)
+                        .setTitle("Add to Favorites")
+                        .setMultiChoiceItems(boardNames, checkedItems) { _, which, isChecked ->
+                            val boardId = boards[which].id
+                            if (isChecked) {
+                                db.child("users").child(userId).child("favorites").child(boardId).setValue(true)
+                            } else {
+                                db.child("users").child(userId).child("favorites").child(boardId).removeValue()
+                            }
+                        }
+                        .setPositiveButton("Done", null)
+                        .show()
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.w("HomeActivity", "Failed to load boards for dialog.", error.toException())
                 }
             })
     }
@@ -235,8 +316,36 @@ class HomeActivity : AppCompatActivity() {
             showDeleteBoardConfirmationDialog(board)
         }
 
+        val starView = dialogView.findViewById<TextView>(R.id.tv_favorite_board)
+        auth.currentUser?.let { user ->
+            db.child("users").child(user.uid).child("favorites").child(board.id).get().addOnSuccessListener {
+                if(it.exists()) {
+                    starView.text = "Unfavorite"
+                } else {
+                    starView.text = "Favorite"
+                }
+            }
+
+            starView.setOnClickListener {
+                dialog.dismiss()
+                toggleFavorite(user.uid, board.id)
+            }
+        }
+
         dialog.show()
     }
+
+    private fun toggleFavorite(uid: String, boardId: String) {
+        val favoriteRef = db.child("users").child(uid).child("favorites").child(boardId)
+        favoriteRef.get().addOnSuccessListener {
+            if (it.exists()) {
+                favoriteRef.removeValue()
+            } else {
+                favoriteRef.setValue(true)
+            }
+        }
+    }
+
 
     private fun showRenameBoardDialog(board: Board) {
         val editText = EditText(this)

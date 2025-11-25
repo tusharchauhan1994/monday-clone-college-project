@@ -8,14 +8,20 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mondaycloneapp.models.Board
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 import java.util.concurrent.TimeUnit
 
 class BoardAdapter(
     private val context: Context,
     private val boards: List<Board>,
     private val onBoardClick: (Board) -> Unit,
-    private val onBoardLongClick: (Board) -> Unit
+    private val onBoardLongClick: (Board) -> Unit,
+    private val onStarClick: (Board) -> Unit
 ) : RecyclerView.Adapter<BoardAdapter.BoardViewHolder>() {
+
+    private val db = FirebaseDatabase.getInstance().reference
+    private val userId = FirebaseAuth.getInstance().currentUser?.uid
 
     inner class BoardViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val boardName: TextView = itemView.findViewById(R.id.tv_board_name)
@@ -37,7 +43,18 @@ class BoardAdapter(
             }
 
             starIcon.setOnClickListener {
-                // Handle star/favorite toggle
+                onStarClick(board)
+            }
+
+            // Set star icon based on favorite status
+            userId?.let {
+                db.child("users").child(it).child("favorites").child(board.id).get().addOnSuccessListener {
+                    if (it.exists()) {
+                        starIcon.setImageResource(android.R.drawable.btn_star_big_on)
+                    } else {
+                        starIcon.setImageResource(android.R.drawable.btn_star_big_off)
+                    }
+                }
             }
         }
 

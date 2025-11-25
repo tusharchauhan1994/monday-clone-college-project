@@ -58,15 +58,24 @@ class MyWorkActivity : AppCompatActivity() {
                             boardsList.add(board)
                         }
                     }
-                    boardAdapter = BoardAdapter(this@MyWorkActivity, boardsList, {
-                        board ->
-                        val intent = Intent(this@MyWorkActivity, TaskListActivity::class.java)
-                        intent.putExtra("BOARD_ID", board.id)
-                        intent.putExtra("BOARD_NAME", board.name)
-                        startActivity(intent)
-                    }) { board ->
-                        showBoardOptionsDialog(board)
-                    }
+                    boardAdapter = BoardAdapter(
+                        context = this@MyWorkActivity,
+                        boards = boardsList,
+                        onBoardClick = { board ->
+                            val intent = Intent(this@MyWorkActivity, TaskListActivity::class.java)
+                            intent.putExtra("BOARD_ID", board.id)
+                            intent.putExtra("BOARD_NAME", board.name)
+                            startActivity(intent)
+                        },
+                        onBoardLongClick = { board ->
+                            showBoardOptionsDialog(board)
+                        },
+                        onStarClick = { board ->
+                            auth.currentUser?.uid?.let { userId ->
+                                toggleFavorite(userId, board.id)
+                            }
+                        }
+                    )
                     rvBoards.adapter = boardAdapter
                     Log.d("MyWorkActivity", "Successfully loaded ${boardsList.size} boards.")
                 }
@@ -75,6 +84,17 @@ class MyWorkActivity : AppCompatActivity() {
                     Log.e("MyWorkActivity", "Error loading boards", error.toException())
                 }
             })
+    }
+
+    private fun toggleFavorite(uid: String, boardId: String) {
+        val favoriteRef = db.child("users").child(uid).child("favorites").child(boardId)
+        favoriteRef.get().addOnSuccessListener {
+            if (it.exists()) {
+                favoriteRef.removeValue()
+            } else {
+                favoriteRef.setValue(true)
+            }
+        }
     }
 
     private fun showBoardOptionsDialog(board: Board) {
@@ -91,6 +111,22 @@ class MyWorkActivity : AppCompatActivity() {
         dialogView.findViewById<TextView>(R.id.tv_delete_board).setOnClickListener {
             dialog.dismiss()
             showDeleteBoardConfirmationDialog(board)
+        }
+
+        val starView = dialogView.findViewById<TextView>(R.id.tv_favorite_board)
+        auth.currentUser?.let { user ->
+            db.child("users").child(user.uid).child("favorites").child(board.id).get().addOnSuccessListener {
+                if(it.exists()) {
+                    starView.text = "Unfavorite"
+                } else {
+                    starView.text = "Favorite"
+                }
+            }
+
+            starView.setOnClickListener {
+                dialog.dismiss()
+                toggleFavorite(user.uid, board.id)
+            }
         }
 
         dialog.show()
