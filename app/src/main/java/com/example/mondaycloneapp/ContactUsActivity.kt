@@ -2,10 +2,11 @@ package com.example.mondaycloneapp
 
 import android.os.Bundle
 import android.widget.Button
-import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.mondaycloneapp.models.ContactUs
+import com.google.android.material.textfield.TextInputEditText
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 
 class ContactUsActivity : AppCompatActivity() {
@@ -14,20 +15,28 @@ class ContactUsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_contact_us)
 
-        val etName = findViewById<EditText>(R.id.et_name)
-        val etEmail = findViewById<EditText>(R.id.et_email)
-        val etContactNumber = findViewById<EditText>(R.id.et_contact_number)
-        val etMessage = findViewById<EditText>(R.id.et_message)
-        val btnSubmit = findViewById<Button>(R.id.btn_submit)
+        val etName = findViewById<TextInputEditText>(R.id.et_name)
+        val etEmail = findViewById<TextInputEditText>(R.id.et_email)
+        val etPhone = findViewById<TextInputEditText>(R.id.et_phone)
+        val etCompany = findViewById<TextInputEditText>(R.id.et_company)
+        val etWebsite = findViewById<TextInputEditText>(R.id.et_website)
+        val etSubject = findViewById<TextInputEditText>(R.id.et_subject)
+        val etMessage = findViewById<TextInputEditText>(R.id.et_message)
+        val btnSend = findViewById<Button>(R.id.btn_send)
 
-        btnSubmit.setOnClickListener {
+        btnSend.setOnClickListener {
             val name = etName.text.toString().trim()
             val email = etEmail.text.toString().trim()
-            val contactNumber = etContactNumber.text.toString().trim()
+            val phone = etPhone.text.toString().trim()
+            val company = etCompany.text.toString().trim()
+            val website = etWebsite.text.toString().trim()
+            val subject = etSubject.text.toString().trim()
             val message = etMessage.text.toString().trim()
+            val user = FirebaseAuth.getInstance().currentUser
+            val loginGmail = user?.email
 
-            if (name.isNotEmpty() && email.isNotEmpty() && contactNumber.isNotEmpty() && message.isNotEmpty()) {
-                val contactUs = ContactUs(name, email, contactNumber, message)
+            if (name.isNotEmpty() && email.isNotEmpty()) {
+                val contactUs = ContactUs(name, email, phone, company, website, subject, message, loginGmail)
                 FirebaseDatabase.getInstance().getReference("ContactUs")
                     .push()
                     .setValue(contactUs)
@@ -40,7 +49,7 @@ class ContactUsActivity : AppCompatActivity() {
                         }
                     }
             } else {
-                Toast.makeText(this, "Please fill all the fields.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Please fill all the required fields.", Toast.LENGTH_SHORT).show()
             }
         }
     }
